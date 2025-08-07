@@ -1,0 +1,15 @@
+# dependencies
+node_modules
+
+# output
+dist
+
+# code coverage
+coverage
+
+# dotenv environment variable files
+.env*
+!.env.example
+
+# misc
+.DS_Store
