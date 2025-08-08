@@ -9,12 +9,12 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
-const shutdown = async () => {
+async function shutdown() {
   // eslint-disable-next-line no-console
   console.log('Shutting down...');
   await prisma.$disconnect();
   server.close(() => process.exit(0));
-};
+}
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
