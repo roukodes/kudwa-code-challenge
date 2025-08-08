@@ -9,14 +9,9 @@ generator client {
 }
 
 generator zod {
-    provider           = "prisma-zod-generator"
-    output             = "../../../packages/types/src"
-    isGenerateSelect   = false
-    isGenerateInclude  = false
-    exportTypedSchemas = true
-    exportZodSchemas   = true
-    typedSchemaSuffix  = "Schema"
-    zodSchemaSuffix    = "ZodSchema"
+    provider         = "zod-prisma-types"
+    output           = "../../../packages/types/src"
+    useMultipleFiles = true
 }
 
 // ---------- ENUMS ----------

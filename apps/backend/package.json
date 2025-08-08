@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "prisma": "^6.13.0",
-    "prisma-zod-generator": "^1.2.0"
+    "zod-prisma-types": "^3.2.4"
   },
   "peerDependencies": {
     "decimal.js": "^10",
