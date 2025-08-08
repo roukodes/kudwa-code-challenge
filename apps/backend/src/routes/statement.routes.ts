@@ -9,9 +9,30 @@ const router = Router();
 const PeriodParams = z.object({ periodId: z.coerce.number().int().positive() });
 
 /**
- * GET /api/statements/:periodId
- * Returns a statement (totals + categories) with nested line items
+ * @openapi
+ * /statements/{periodId}:
+ *   get:
+ *     tags: [Statements]
+ *     summary: Get statement (totals + categories + nested items) for a period
+ *     parameters:
+ *       - in: path
+ *         name: periodId
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data: { $ref: '#/components/schemas/StatementResponse' }
+ *       404: { description: Not found }
  */
+
 router.get(
   '/:periodId',
   validate(PeriodParams, 'params'),
