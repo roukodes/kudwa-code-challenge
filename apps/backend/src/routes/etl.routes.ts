@@ -1,17 +1,16 @@
 import { Router } from 'express';
 
-import { runETLService } from '@/services/etl.service';
+import { runETL } from '@/etl';
+import { asyncHandler, success } from '@/middleware/response';
 
 const router = Router();
 
-// Trigger ETL
-router.post('/run', async (_req, res, next) => {
-  try {
-    const result = await runETLService();
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/run',
+  asyncHandler(async (_req, res) => {
+    const result = await runETL();
+    return success(res, result);
+  }),
+);
 
 export default router;
