@@ -8,7 +8,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 
 export default tsEslint.config([
-  globalIgnores(['dist', 'coverage']),
+  globalIgnores(['**/dist', 'coverage']),
 
   // Base JS rules
   {
