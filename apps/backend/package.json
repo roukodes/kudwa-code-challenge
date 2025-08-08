@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
     "prisma:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "dotenv -e ../../.env -- prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",

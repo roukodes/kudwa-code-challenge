@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-
+import { prisma } from '@/db';
 import type { TableReportJsonType } from '@/types/data.types';
 
 import { upsertPeriod } from './shared';
-
-const prisma = new PrismaClient();
 
 type HeaderType = TableReportJsonType['data']['Header'] | null;
 

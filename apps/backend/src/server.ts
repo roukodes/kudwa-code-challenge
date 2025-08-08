@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-
 import app from '@/app';
+import { env } from '@/config';
+import { prisma } from '@/db';
 
-const prisma = new PrismaClient();
-const PORT = process.env.PORT;
+const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
   // eslint-disable-next-line no-console

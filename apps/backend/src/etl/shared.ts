@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-
+import { prisma } from '@/db';
 import { dateRangeToLabel } from '@/utils/helpers';
-
-const prisma = new PrismaClient();
 
 export async function upsertPeriod(start: Date, end: Date, label?: string) {
   const periodLabel = label ?? dateRangeToLabel(start);

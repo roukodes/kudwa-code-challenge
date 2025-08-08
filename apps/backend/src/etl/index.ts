@@ -1,13 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-
+import { prisma } from '@/db';
 import type { MonthlyStatementsJsonType, TableReportJsonType } from '@/types/data.types';
 import { COMPANY_ID, COMPANY_NAME } from '@/utils/constants';
 import { loadJsonFile } from '@/utils/helpers';
 
 import { loadMonthlyStatements } from './loadMonthlyStatements';
 import { loadTableReport } from './loadTableReports';
-
-const prisma = new PrismaClient();
 
 export async function runETL() {
   const monthlyData = loadJsonFile<MonthlyStatementsJsonType>('data/monthly-statements.json');

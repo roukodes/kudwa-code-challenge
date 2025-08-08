@@ -1,11 +1,9 @@
 import type { StatementCategoryType } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
 
+import { prisma } from '@/db';
 import type { MonthlyStatementsJsonType } from '@/types/data.types';
 
 import { upsertPeriod } from './shared';
-
-const prisma = new PrismaClient();
 
 export async function loadMonthlyStatements(data: MonthlyStatementsJsonType, companyId: number) {
   for (const s of data.data) {

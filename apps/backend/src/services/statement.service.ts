@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/db';
 
 function buildTree(items: Array<any>) {
   const map = new Map<number, any>();
