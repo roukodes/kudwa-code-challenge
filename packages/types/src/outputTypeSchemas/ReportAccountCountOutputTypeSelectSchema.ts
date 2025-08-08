@@ -6,7 +6,6 @@ export const ReportAccountCountOutputTypeSelectSchema: z.ZodType<Prisma.ReportAc
     .object({
       childAccounts: z.boolean().optional(),
       values: z.boolean().optional(),
-      AccountMapping: z.boolean().optional(),
     })
     .strict();
 

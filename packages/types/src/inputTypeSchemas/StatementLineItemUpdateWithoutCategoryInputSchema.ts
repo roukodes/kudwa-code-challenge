@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingUpdateManyWithoutStatementLineItemNestedInputSchema } from './AccountMappingUpdateManyWithoutStatementLineItemNestedInputSchema';
 import { NullableFloatFieldUpdateOperationsInputSchema } from './NullableFloatFieldUpdateOperationsInputSchema';
 import { NullableStringFieldUpdateOperationsInputSchema } from './NullableStringFieldUpdateOperationsInputSchema';
 import { StatementLineItemUpdateManyWithoutParentLineItemNestedInputSchema } from './StatementLineItemUpdateManyWithoutParentLineItemNestedInputSchema';
@@ -25,9 +24,6 @@ export const StatementLineItemUpdateWithoutCategoryInputSchema: z.ZodType<Prisma
         .optional(),
       childLineItems: z
         .lazy(() => StatementLineItemUpdateManyWithoutParentLineItemNestedInputSchema)
-        .optional(),
-      AccountMapping: z
-        .lazy(() => AccountMappingUpdateManyWithoutStatementLineItemNestedInputSchema)
         .optional(),
     })
     .strict();

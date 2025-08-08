@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { StatementLineItemCreateInputSchema } from '../inputTypeSchemas/StatementLineItemCreateInputSchema';
 import { StatementLineItemIncludeSchema } from '../inputTypeSchemas/StatementLineItemIncludeSchema';
 import { StatementLineItemUncheckedCreateInputSchema } from '../inputTypeSchemas/StatementLineItemUncheckedCreateInputSchema';
-import { AccountMappingFindManyArgsSchema } from '../outputTypeSchemas/AccountMappingFindManyArgsSchema';
 import { StatementCategoryArgsSchema } from '../outputTypeSchemas/StatementCategoryArgsSchema';
 import { StatementLineItemArgsSchema } from '../outputTypeSchemas/StatementLineItemArgsSchema';
 import { StatementLineItemCountOutputTypeArgsSchema } from '../outputTypeSchemas/StatementLineItemCountOutputTypeArgsSchema';
@@ -24,9 +23,6 @@ export const StatementLineItemSelectSchema: z.ZodType<Prisma.StatementLineItemSe
     parentLineItem: z.union([z.boolean(), z.lazy(() => StatementLineItemArgsSchema)]).optional(),
     childLineItems: z
       .union([z.boolean(), z.lazy(() => StatementLineItemFindManyArgsSchema)])
-      .optional(),
-    AccountMapping: z
-      .union([z.boolean(), z.lazy(() => AccountMappingFindManyArgsSchema)])
       .optional(),
     _count: z
       .union([z.boolean(), z.lazy(() => StatementLineItemCountOutputTypeArgsSchema)])

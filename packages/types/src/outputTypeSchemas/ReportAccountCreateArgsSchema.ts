@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { ReportAccountCreateInputSchema } from '../inputTypeSchemas/ReportAccountCreateInputSchema';
 import { ReportAccountIncludeSchema } from '../inputTypeSchemas/ReportAccountIncludeSchema';
 import { ReportAccountUncheckedCreateInputSchema } from '../inputTypeSchemas/ReportAccountUncheckedCreateInputSchema';
-import { AccountMappingFindManyArgsSchema } from '../outputTypeSchemas/AccountMappingFindManyArgsSchema';
 import { ReportAccountArgsSchema } from '../outputTypeSchemas/ReportAccountArgsSchema';
 import { ReportAccountCountOutputTypeArgsSchema } from '../outputTypeSchemas/ReportAccountCountOutputTypeArgsSchema';
 import { ReportAccountFindManyArgsSchema } from '../outputTypeSchemas/ReportAccountFindManyArgsSchema';
@@ -24,9 +23,6 @@ export const ReportAccountSelectSchema: z.ZodType<Prisma.ReportAccountSelect> = 
     parentAccount: z.union([z.boolean(), z.lazy(() => ReportAccountArgsSchema)]).optional(),
     childAccounts: z.union([z.boolean(), z.lazy(() => ReportAccountFindManyArgsSchema)]).optional(),
     values: z.union([z.boolean(), z.lazy(() => ReportAccountValueFindManyArgsSchema)]).optional(),
-    AccountMapping: z
-      .union([z.boolean(), z.lazy(() => AccountMappingFindManyArgsSchema)])
-      .optional(),
     _count: z.union([z.boolean(), z.lazy(() => ReportAccountCountOutputTypeArgsSchema)]).optional(),
   })
   .strict();

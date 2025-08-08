@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingOrderByRelationAggregateInputSchema } from './AccountMappingOrderByRelationAggregateInputSchema';
 import { SortOrderInputSchema } from './SortOrderInputSchema';
 import { SortOrderSchema } from './SortOrderSchema';
 import { StatementCategoryOrderByWithRelationInputSchema } from './StatementCategoryOrderByWithRelationInputSchema';
@@ -26,7 +25,6 @@ export const StatementLineItemOrderByWithRelationInputSchema: z.ZodType<Prisma.S
       category: z.lazy(() => StatementCategoryOrderByWithRelationInputSchema).optional(),
       parentLineItem: z.lazy(() => StatementLineItemOrderByWithRelationInputSchema).optional(),
       childLineItems: z.lazy(() => StatementLineItemOrderByRelationAggregateInputSchema).optional(),
-      AccountMapping: z.lazy(() => AccountMappingOrderByRelationAggregateInputSchema).optional(),
       _relevance: z.lazy(() => StatementLineItemOrderByRelevanceInputSchema).optional(),
     })
     .strict();

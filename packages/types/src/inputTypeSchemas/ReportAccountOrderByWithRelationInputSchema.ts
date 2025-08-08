@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingOrderByRelationAggregateInputSchema } from './AccountMappingOrderByRelationAggregateInputSchema';
 import { ReportAccountOrderByRelationAggregateInputSchema } from './ReportAccountOrderByRelationAggregateInputSchema';
 import { ReportAccountOrderByRelevanceInputSchema } from './ReportAccountOrderByRelevanceInputSchema';
 import { ReportAccountValueOrderByRelationAggregateInputSchema } from './ReportAccountValueOrderByRelationAggregateInputSchema';
@@ -23,7 +22,6 @@ export const ReportAccountOrderByWithRelationInputSchema: z.ZodType<Prisma.Repor
       parentAccount: z.lazy(() => ReportAccountOrderByWithRelationInputSchema).optional(),
       childAccounts: z.lazy(() => ReportAccountOrderByRelationAggregateInputSchema).optional(),
       values: z.lazy(() => ReportAccountValueOrderByRelationAggregateInputSchema).optional(),
-      AccountMapping: z.lazy(() => AccountMappingOrderByRelationAggregateInputSchema).optional(),
       _relevance: z.lazy(() => ReportAccountOrderByRelevanceInputSchema).optional(),
     })
     .strict();
