@@ -106,5 +106,5 @@ export const swaggerSpec = swaggerJsdoc({
       },
     },
   },
-  apis: ['src/routes/**/*.ts'], // scan route files for JSDoc
+  apis: ['src/routes/**/*.ts'],
 });

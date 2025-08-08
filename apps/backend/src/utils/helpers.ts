@@ -4,10 +4,8 @@ import path from 'path';
 /**
  * Load JSON file from relative path.
  *
- * @export
  * @template T
  * @param {string} relativePath
- * @returns {T}
  */
 export function loadJsonFile<T>(relativePath: string): T {
   const p = path.join(process.cwd(), relativePath);
@@ -18,12 +16,10 @@ export function loadJsonFile<T>(relativePath: string): T {
 /**
  * Convert date to label.
  *
- * @export
  * @param {string | Date} date
  * @param {Intl.DateTimeFormatOptions} [format={ month: 'short', year: 'numeric' }]
- * @returns {string}
  */
-export function dateRangeToLabel(
+export function dateToLabel(
   date: string | Date,
   format: Intl.DateTimeFormatOptions = { month: 'short', year: 'numeric' },
 ) {
@@ -34,4 +30,29 @@ export function dateRangeToLabel(
     console.error(e);
     return date.toString();
   }
+}
+
+/**
+ * Build tree from flat array.
+ *
+ * @param {Array<T>} items
+ * @param {string} [identifier='id']
+ * @param {string} [parentIdentifier='parentLineItemId']
+ */
+export function buildTree<T>(
+  items: Array<T>,
+  identifier = 'id',
+  parentIdentifier = 'parentLineItemId',
+) {
+  const map = new Map<number, any>();
+  const roots: any[] = [];
+  items.forEach((n) => map.set(n[identifier], { ...n, children: [] as any[] }));
+  items.forEach((n) => {
+    if (n[parentIdentifier] && map.has(n[parentIdentifier])) {
+      map.get(n[parentIdentifier]).children.push(map.get(n[identifier]));
+    } else {
+      roots.push(map.get(n[identifier]));
+    }
+  });
+  return roots;
 }

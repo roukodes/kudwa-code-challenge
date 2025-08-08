@@ -1,5 +1,11 @@
 import { prisma } from '@/db';
+import type { ReportParamsType } from '@/validators/report.validator';
 
+/**
+ * Retrieves a list of all report headers, sorted by start period descending.
+ *
+ * @returns Array of report headers with id, name, period, and currency info.
+ */
 export async function listReports() {
   return prisma.reportHeader.findMany({
     orderBy: [{ startPeriod: 'desc' }],
@@ -13,7 +19,17 @@ export async function listReports() {
   });
 }
 
-export async function getReportHierarchy(reportId: number) {
+/**
+ * Retrieves the account hierarchy for a given report, including period values.
+ *
+ * Fetches all accounts for the report, including their values for each period, and
+ * builds a tree structure based on parent-child relationships.
+ *
+ * @param reportId - The unique identifier for the report
+ * @returns Array of root account nodes, each with nested children and period values
+ */
+export async function getReportHierarchy(reportId: ReportParamsType['reportId']) {
+  // Fetch all accounts for the specified report, including period values
   const accounts = await prisma.reportAccount.findMany({
     where: { reportId },
     include: {
@@ -24,9 +40,10 @@ export async function getReportHierarchy(reportId: number) {
 
   if (accounts.length === 0) return [];
 
-  const byId = new Map<number, any>();
+  // Index accounts by their ID for fast lookup
+  const accountsById = new Map<number, any>();
   accounts.forEach((a) =>
-    byId.set(a.id, {
+    accountsById.set(a.id, {
       id: a.id,
       accountName: a.accountName,
       type: a.type,
@@ -40,14 +57,16 @@ export async function getReportHierarchy(reportId: number) {
     }),
   );
 
+  // Build the hierarchy by attaching children to their parent nodes
   const roots: any[] = [];
-  byId.forEach((node) => {
-    if (node.parentAccountId && byId.has(node.parentAccountId)) {
-      byId.get(node.parentAccountId).children.push(node);
+  accountsById.forEach((node) => {
+    if (node.parentAccountId && accountsById.has(node.parentAccountId)) {
+      accountsById.get(node.parentAccountId).children.push(node);
     } else {
       roots.push(node);
     }
   });
 
+  // Return the root nodes, each with nested children
   return roots;
 }

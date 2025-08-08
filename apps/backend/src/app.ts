@@ -10,6 +10,7 @@ import routes from '@/routes';
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
@@ -20,6 +21,7 @@ app.use(errorHandler);
 // Routes
 app.use('/api', routes);
 
+// Docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check

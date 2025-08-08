@@ -1,8 +1,8 @@
 import { prisma } from '@/db';
-import { dateRangeToLabel } from '@/utils/helpers';
+import { dateToLabel } from '@/utils/helpers';
 
 export async function upsertPeriod(start: Date, end: Date, label?: string) {
-  const periodLabel = label ?? dateRangeToLabel(start);
+  const periodLabel = label ?? dateToLabel(start);
 
   const period = await prisma.period.upsert({
     where: { startDate_endDate: { startDate: start, endDate: end } },

@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { z } from 'zod';
 
 import { asyncHandler, success } from '@/middleware/response';
 import { validate } from '@/middleware/validate';
 import { getReportHierarchy, listReports } from '@/services/report.service';
+import { ReportParams } from '@/validators/report.validator';
 
 const router = Router();
-const ReportParams = z.object({ reportId: z.coerce.number().int().positive() });
 
 /**
  * @openapi
@@ -60,14 +59,13 @@ router.get(
  *                     data:
  *                       type: array
  *                       items: { $ref: '#/components/schemas/ReportNode' }
- *       404: { description: Not found }
  */
 router.get(
   '/:reportId',
   validate(ReportParams, 'params'),
   asyncHandler(async (req, res) => {
-    const { reportId } = (req as any)._params as z.infer<typeof ReportParams>;
-    const data = await getReportHierarchy(reportId);
+    const params = ReportParams.parse(req._params);
+    const data = await getReportHierarchy(params.reportId);
     return success(res, data);
   }),
 );
