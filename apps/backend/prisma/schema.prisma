@@ -88,7 +88,6 @@ model StatementLineItem {
     category       StatementCategory   @relation(fields: [categoryId], references: [id])
     parentLineItem StatementLineItem?  @relation("LineItemHierarchy", fields: [parentLineItemId], references: [id])
     childLineItems StatementLineItem[] @relation("LineItemHierarchy")
-    AccountMapping AccountMapping[]
 }
 
 model Statement {
@@ -149,20 +148,6 @@ model ReportAccountValue {
     @@index([periodId])
 }
 
-model AccountMapping {
-    id                  Int     @id @default(autoincrement())
-    statementLineItemId Int
-    reportAccountId     Int
-    notes               String?
-
-    // Relations
-    statementLineItem StatementLineItem @relation(fields: [statementLineItemId], references: [id])
-    reportAccount     ReportAccount     @relation(fields: [reportAccountId], references: [id])
-
-    // Indices
-    @@index([statementLineItemId, reportAccountId])
-}
-
 model ReportAccount {
     id              Int                @id @default(autoincrement())
     reportId        Int
@@ -171,11 +156,10 @@ model ReportAccount {
     type            ReportAccountType?
 
     // Relations
-    report         ReportHeader         @relation(fields: [reportId], references: [id])
-    parentAccount  ReportAccount?       @relation("AccountHierarchy", fields: [parentAccountId], references: [id])
-    childAccounts  ReportAccount[]      @relation("AccountHierarchy")
-    values         ReportAccountValue[]
-    AccountMapping AccountMapping[]
+    report        ReportHeader         @relation(fields: [reportId], references: [id])
+    parentAccount ReportAccount?       @relation("AccountHierarchy", fields: [parentAccountId], references: [id])
+    childAccounts ReportAccount[]      @relation("AccountHierarchy")
+    values        ReportAccountValue[]
 
     // Indices
     @@index([reportId, type])

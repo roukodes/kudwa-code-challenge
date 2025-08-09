@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingListRelationFilterSchema } from './AccountMappingListRelationFilterSchema';
 import { EnumReportAccountTypeNullableFilterSchema } from './EnumReportAccountTypeNullableFilterSchema';
 import { IntFilterSchema } from './IntFilterSchema';
 import { IntNullableFilterSchema } from './IntNullableFilterSchema';
@@ -67,7 +66,6 @@ export const ReportAccountWhereUniqueInputSchema: z.ZodType<Prisma.ReportAccount
             .nullable(),
           childAccounts: z.lazy(() => ReportAccountListRelationFilterSchema).optional(),
           values: z.lazy(() => ReportAccountValueListRelationFilterSchema).optional(),
-          AccountMapping: z.lazy(() => AccountMappingListRelationFilterSchema).optional(),
         })
         .strict(),
     );

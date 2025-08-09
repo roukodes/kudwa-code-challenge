@@ -5,7 +5,6 @@ export const StatementLineItemCountOutputTypeSelectSchema: z.ZodType<Prisma.Stat
   z
     .object({
       childLineItems: z.boolean().optional(),
-      AccountMapping: z.boolean().optional(),
     })
     .strict();
 

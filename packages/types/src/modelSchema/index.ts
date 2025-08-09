@@ -1,4 +1,3 @@
-export * from './AccountMappingSchema';
 export * from './CompanySchema';
 export * from './PeriodSchema';
 export * from './ReportAccountSchema';

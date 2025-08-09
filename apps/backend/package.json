@@ -2,16 +2,35 @@
   "name": "@kudwa-code-challenge/backend",
   "version": "0.1.0",
   "private": true,
+  "type": "commonjs",
   "scripts": {
+    "dev": "dotenv -e ../../.env -- nodemon",
+    "build": "tsc -p .",
+    "start": "dotenv -e ../../.env -- node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
-    "prisma:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy"
+    "prisma:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "prisma:studio": "dotenv -e ../../.env -- prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^6.13.0"
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "nodemon": "^3.1.10",
     "prisma": "^6.13.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "zod-prisma-types": "^3.2.4"
   },
   "peerDependencies": {

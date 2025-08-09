@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingListRelationFilterSchema } from './AccountMappingListRelationFilterSchema';
 import { FloatNullableFilterSchema } from './FloatNullableFilterSchema';
 import { IntFilterSchema } from './IntFilterSchema';
 import { IntNullableFilterSchema } from './IntNullableFilterSchema';
@@ -59,7 +58,6 @@ export const StatementLineItemWhereInputSchema: z.ZodType<Prisma.StatementLineIt
       .optional()
       .nullable(),
     childLineItems: z.lazy(() => StatementLineItemListRelationFilterSchema).optional(),
-    AccountMapping: z.lazy(() => AccountMappingListRelationFilterSchema).optional(),
   })
   .strict();
 

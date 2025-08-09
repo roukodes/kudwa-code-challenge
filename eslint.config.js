@@ -33,7 +33,11 @@ export default tsEslint.config([
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: ['./tsconfig.base.json', './packages/types/tsconfig.json'],
+        project: [
+          './tsconfig.base.json',
+          './packages/types/tsconfig.json',
+          './apps/backend/tsconfig.json',
+        ],
       },
     },
     plugins: {

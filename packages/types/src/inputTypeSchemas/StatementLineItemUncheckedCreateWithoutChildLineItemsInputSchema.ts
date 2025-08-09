@@ -1,8 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingUncheckedCreateNestedManyWithoutStatementLineItemInputSchema } from './AccountMappingUncheckedCreateNestedManyWithoutStatementLineItemInputSchema';
-
 export const StatementLineItemUncheckedCreateWithoutChildLineItemsInputSchema: z.ZodType<Prisma.StatementLineItemUncheckedCreateWithoutChildLineItemsInput> =
   z
     .object({
@@ -12,9 +10,6 @@ export const StatementLineItemUncheckedCreateWithoutChildLineItemsInputSchema: z
       name: z.string(),
       value: z.number().optional().nullable(),
       accountId: z.string().optional().nullable(),
-      AccountMapping: z
-        .lazy(() => AccountMappingUncheckedCreateNestedManyWithoutStatementLineItemInputSchema)
-        .optional(),
     })
     .strict();
 

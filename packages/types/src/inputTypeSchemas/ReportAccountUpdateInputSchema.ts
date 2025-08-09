@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingUpdateManyWithoutReportAccountNestedInputSchema } from './AccountMappingUpdateManyWithoutReportAccountNestedInputSchema';
 import { NullableEnumReportAccountTypeFieldUpdateOperationsInputSchema } from './NullableEnumReportAccountTypeFieldUpdateOperationsInputSchema';
 import { ReportAccountTypeSchema } from './ReportAccountTypeSchema';
 import { ReportAccountUpdateManyWithoutParentAccountNestedInputSchema } from './ReportAccountUpdateManyWithoutParentAccountNestedInputSchema';
@@ -30,9 +29,6 @@ export const ReportAccountUpdateInputSchema: z.ZodType<Prisma.ReportAccountUpdat
       .lazy(() => ReportAccountUpdateManyWithoutParentAccountNestedInputSchema)
       .optional(),
     values: z.lazy(() => ReportAccountValueUpdateManyWithoutAccountNestedInputSchema).optional(),
-    AccountMapping: z
-      .lazy(() => AccountMappingUpdateManyWithoutReportAccountNestedInputSchema)
-      .optional(),
   })
   .strict();
 

@@ -1,7 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { AccountMappingCreateNestedManyWithoutReportAccountInputSchema } from './AccountMappingCreateNestedManyWithoutReportAccountInputSchema';
 import { ReportAccountCreateNestedManyWithoutParentAccountInputSchema } from './ReportAccountCreateNestedManyWithoutParentAccountInputSchema';
 import { ReportAccountCreateNestedOneWithoutChildAccountsInputSchema } from './ReportAccountCreateNestedOneWithoutChildAccountsInputSchema';
 import { ReportAccountTypeSchema } from './ReportAccountTypeSchema';
@@ -23,9 +22,6 @@ export const ReportAccountCreateInputSchema: z.ZodType<Prisma.ReportAccountCreat
       .lazy(() => ReportAccountCreateNestedManyWithoutParentAccountInputSchema)
       .optional(),
     values: z.lazy(() => ReportAccountValueCreateNestedManyWithoutAccountInputSchema).optional(),
-    AccountMapping: z
-      .lazy(() => AccountMappingCreateNestedManyWithoutReportAccountInputSchema)
-      .optional(),
   })
   .strict();
 
