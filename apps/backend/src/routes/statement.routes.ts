@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { asyncHandler, success } from '@/middleware/response';
 import { validate } from '@/middleware/validate';
 import { getStatementByPeriod, listStatements } from '@/services/statement.service';
+import { API_STATUS_CODES } from '@/utils/constants';
 import { ListQuery, PeriodParams } from '@/validators/statement.validator';
 
 const router = Router();
@@ -100,7 +101,10 @@ router.get(
   asyncHandler(async (req, res) => {
     const params = PeriodParams.parse(req._params);
     const data = await getStatementByPeriod(params.periodId);
-    if (!data) return res.status(404).json({ success: false, message: 'Statement not found' });
+    if (!data)
+      return res
+        .status(API_STATUS_CODES.NOT_FOUND)
+        .json({ success: false, message: 'Statement not found' });
     return success(res, data);
   }),
 );

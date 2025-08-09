@@ -72,7 +72,7 @@ async function createAccount({ tx, reportId, name, type, parentAccountId }: Crea
 async function walkRows(params: WalkRowsParams) {
   const { tx, reportId, cols, periodMap, rows, parentId } = params;
   for (const row of rows) {
-    const headerName = row?.Header?.ColData?.[0]?.value as string | undefined;
+    const headerName = row?.Header?.ColData?.[0]?.value;
     const childRows = row?.Rows?.Row as ReportRows | undefined;
 
     const colData = row?.Header?.ColData;

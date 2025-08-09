@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 
-export function success(res: Response, data: unknown, status = 200) {
+import { API_STATUS_CODES } from '@/utils/constants';
+
+export function success(res: Response, data: unknown, status = API_STATUS_CODES.OK) {
   return res.status(status).json({ success: true, data });
 }
 
