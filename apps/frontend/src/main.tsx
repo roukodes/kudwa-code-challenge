@@ -12,12 +12,15 @@ import { BrowserRouter } from 'react-router';
 
 import App from '@/App.tsx';
 import queryClient from '@/clients/query.client';
+import ThemeProvider from '@/providers/ThemeProvider';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </BrowserRouter>

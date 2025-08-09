@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router';
 
+import Layout from '@/components/layout/Layout';
 import Home from '@/pages/home/Home';
 import Insights from '@/pages/insights/Insights';
 
@@ -10,8 +11,10 @@ function MainNavigation() {
   //   TODO: add error boundary
   return (
     <Routes>
-      <Route path={screenNames.HOME} element={<Home />} />
-      <Route path={screenNames.INSIGHTS} element={<Insights />} />
+      <Route element={<Layout />}>
+        <Route path={screenNames.HOME} element={<Home />} />
+        <Route path={screenNames.INSIGHTS} element={<Insights />} />
+      </Route>
     </Routes>
   );
 }
