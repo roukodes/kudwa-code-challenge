@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import tanstackQuery from '@tanstack/eslint-plugin-query';
 import { globalIgnores } from 'eslint/config';
 import prettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
@@ -104,6 +105,7 @@ export default tseslint.config(
       react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      '@tanstack/query': tanstackQuery,
     },
     languageOptions: {
       parser: tseslint.parser,

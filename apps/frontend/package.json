@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "dotenv -e ../../.env -- vite",
+    "build": "dotenv -e ../../.env --tsc -b && vite build",
+    "preview": "dotenv -e ../../.env -- vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -14,12 +14,16 @@
     "@fontsource/roboto": "^5.2.6",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.3.1",
+    "@tanstack/react-query": "^5.84.2",
+    "@tanstack/react-query-devtools": "^5.84.2",
+    "axios": "^1.11.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.8.0",
     "zod": "^4"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.83.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^4.7.0",
