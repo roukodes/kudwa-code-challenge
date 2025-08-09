@@ -7,8 +7,11 @@ const queryClient = new QueryClient({
     },
     queries: {
       retry: 1,
+      staleTime: 3 * 60 * 1000,
       refetchOnWindowFocus: false,
-      staleTime: 1000 * 60 * 3, // 3 minutes
+      // Our success response always looks like { success: true, data: ... }
+      // Refer to "response.ts" in the backend middlewares for more
+      select: (data: any) => data?.data,
     },
   },
 });

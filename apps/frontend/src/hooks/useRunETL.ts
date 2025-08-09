@@ -8,7 +8,7 @@ import QUERY_KEYS from '@/services/queryKeys';
 
 async function mutationFn() {
   const res = await axiosClient.post(runETLApi);
-  return res.data as { status?: string; message?: string };
+  return res.data as unknown;
 }
 
 function onSuccess() {
@@ -17,7 +17,13 @@ function onSuccess() {
 }
 
 function useRunETL() {
-  const { mutate, isPending, isSuccess, isError } = useMutation({
+  const {
+    mutate,
+    // TODO: handle toast messages on success and on Error
+    isError: isErrorETL,
+    isSuccess: isSuccessETL,
+    isPending: isLoadingETL,
+  } = useMutation({
     mutationFn,
     onSuccess,
   });
@@ -26,8 +32,7 @@ function useRunETL() {
     mutate();
   }, [mutate]);
 
-  // TODO: handle toast messages on success and on Error
-  return { runETL, isLoadingETL: isPending, isSuccessETL: isSuccess, isErrorETL: isError };
+  return { runETL, isLoadingETL, isSuccessETL, isErrorETL };
 }
 
 export default useRunETL;

@@ -21,7 +21,7 @@ function Layout() {
   const drawerType = isMobile ? 'temporary' : 'persistent';
 
   const drawerWidth = isDrawerOpen && !isMobile ? DRAWER_WIDTH : 0;
-  const contentWidth = isMobile ? '100%' : `calc(100% - ${drawerWidth}px)`;
+  const contentWidth = isMobile ? window.innerWidth : window.innerWidth - drawerWidth;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -44,12 +44,12 @@ function Layout() {
         </Drawer>
       </Box>
 
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flex: 1 }}>
         {/* Top app bar */}
         <TopBar contentWidth={contentWidth} toggleDrawer={toggleDrawer} />
 
         {/* Main content */}
-        <Box component="main" sx={{ p: 3 }}>
+        <Box component="main" sx={{ p: 3, maxWidth: contentWidth }}>
           <Toolbar />
           <Outlet />
         </Box>

@@ -2,8 +2,8 @@ import { Router } from 'express';
 
 import { asyncHandler, success } from '@/middleware/response';
 import { validate } from '@/middleware/validate';
-import { getReportHierarchy, listReports } from '@/services/report.service';
-import { ReportParams } from '@/validators/report.validator';
+import { getReportDetails, listReports } from '@/services/report.service';
+import { ReportByIdParams } from '@/validators/report.validator';
 
 const router = Router();
 
@@ -62,10 +62,10 @@ router.get(
  */
 router.get(
   '/:reportId',
-  validate(ReportParams, 'params'),
+  validate(ReportByIdParams, 'params'),
   asyncHandler(async (req, res) => {
-    const params = ReportParams.parse(req._params);
-    const data = await getReportHierarchy(params.reportId);
+    const params = ReportByIdParams.parse(req._params);
+    const data = await getReportDetails(params.reportId);
     return success(res, data);
   }),
 );

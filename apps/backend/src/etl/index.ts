@@ -7,6 +7,7 @@ import { loadMonthlyStatements } from './loadMonthlyStatements';
 import { loadTableReport } from './loadTableReports';
 
 export async function runETL() {
+  // TODO: read data from external server (note use typescript-json-schema for types)
   const monthlyData = loadJsonFile<MonthlyStatementsJsonType>('data/monthly-statements.json');
   const tableData = loadJsonFile<TableReportJsonType>('data/table-report.json');
 

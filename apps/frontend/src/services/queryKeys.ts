@@ -1,11 +1,11 @@
 const QUERY_KEYS = {
   REPORTS: {
     ALL: ['reports'],
-    ID: (id: string) => ['reports', 'id', id],
+    ID: (id: number) => ['reports', 'id', id?.toString()],
   },
   STATEMENTS: {
     ALL: ['statements'],
-    ID: (id: string) => ['statements', 'id', id],
+    ID: (id: number) => ['statements', 'id', id?.toString()],
   },
 };
 

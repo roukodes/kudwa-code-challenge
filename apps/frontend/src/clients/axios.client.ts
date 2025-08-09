@@ -9,6 +9,4 @@ const axiosClient = axios.create({
   },
 });
 
-// TODO: add request and response interceptors
-
 export { axiosClient };

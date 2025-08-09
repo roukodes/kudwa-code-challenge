@@ -10,7 +10,7 @@ import useRunETL from '@/hooks/useRunETL';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 interface TopBarProps {
-  contentWidth: string;
+  contentWidth: number;
   toggleDrawer: () => void;
 }
 

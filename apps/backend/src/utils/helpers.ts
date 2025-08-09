@@ -1,5 +1,8 @@
+import { ReportAccountType } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+
+import { ACCOUNT_TYPE_MAP } from './constants';
 
 /**
  * Load JSON file from relative path.
@@ -46,4 +49,12 @@ export function buildTree<T>(
     }
   });
   return roots;
+}
+
+/**
+ * Convert a string to a ReportAccountType.
+ */
+export function convertTypeStringToAccountType(str?: string | null): ReportAccountType | undefined {
+  if (!str) return undefined;
+  return ACCOUNT_TYPE_MAP[str];
 }

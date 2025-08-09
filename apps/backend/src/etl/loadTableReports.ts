@@ -3,6 +3,13 @@ import type { ITXClientDenyList } from '@prisma/client/runtime/library';
 
 import { prisma } from '@/db';
 import type { TableReportJsonType } from '@/types/data.types';
+import {
+  COL_KEY_IDENTIFIER,
+  END_DATE_COL_IDENTIFIER,
+  START_DATE_COL_IDENTIFIER,
+  TOTAL_COL_IDENTIFIER,
+} from '@/utils/constants';
+import { convertTypeStringToAccountType } from '@/utils/helpers';
 
 import { upsertPeriod } from './shared';
 
@@ -29,7 +36,7 @@ interface CreateAccountParams {
 }
 
 /**
- * Parses a value (string or number) into a number, handling nulls, dashes, and commas.
+ * Parses a value into a number
  */
 function parseAmount(rawValue: any): number | undefined {
   if (rawValue === null || rawValue === undefined) {
@@ -72,10 +79,9 @@ async function createAccount({ tx, reportId, name, type, parentAccountId }: Crea
 async function walkRows(params: WalkRowsParams) {
   const { tx, reportId, cols, periodMap, rows, parentId } = params;
   for (const row of rows) {
-    const headerName = row?.Header?.ColData?.[0]?.value;
-    const childRows = row?.Rows?.Row as ReportRows | undefined;
-
-    const colData = row?.Header?.ColData;
+    const colData = row?.Header?.ColData ?? [];
+    const headerName = colData?.[0]?.value ?? null;
+    const childRows = (row?.Rows?.Row as ReportRows | undefined) ?? [];
 
     // If this row is a group (has a header), create a parent account and process its children recursively
     if (headerName) {
@@ -84,9 +90,31 @@ async function walkRows(params: WalkRowsParams) {
         reportId,
         name: headerName,
         parentAccountId: parentId,
-        type: (row?.group || null) as ReportAccountType,
+        type: convertTypeStringToAccountType(row?.group),
       });
-      if (childRows?.length) {
+
+      for (let i = 1; i < colData.length && i < cols.length; i++) {
+        const col = cols[i];
+        if (!col) continue;
+
+        const colKey = col.MetaData?.find(
+          (m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER,
+        )?.Value?.trim();
+        if (!colKey || colKey.toLowerCase() === TOTAL_COL_IDENTIFIER) continue;
+
+        const periodId = periodMap.get(colKey);
+        if (!periodId) continue;
+
+        const amount = parseAmount(colData[i]?.value);
+        await tx.reportAccountValue.upsert({
+          where: { accountId_periodId: { accountId: groupAccount.id, periodId } },
+          update: { amount },
+          create: { accountId: groupAccount.id, periodId, amount },
+        });
+      }
+
+      // Recurse into children
+      if (childRows.length) {
         await walkRows({
           tx,
           reportId,
@@ -107,14 +135,20 @@ async function walkRows(params: WalkRowsParams) {
         name,
         reportId,
         parentAccountId: parentId,
-        type: (row?.type || null) as ReportAccountType,
+        type: convertTypeStringToAccountType(row?.type),
       });
 
       // For each period column (skipping the first, which is the row label), upsert the value for this account and period
       for (let i = 1; i < colData.length && i < cols.length; i++) {
-        const label = cols[i]?.ColTitle;
-        if (!label) continue;
-        const periodId = periodMap.get(label);
+        const col = cols[i];
+        if (!col) continue;
+
+        const colKey = col.MetaData?.find(
+          (m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER,
+        )?.Value?.trim();
+        if (!colKey || colKey.toLowerCase() === TOTAL_COL_IDENTIFIER) continue;
+
+        const periodId = periodMap.get(colKey);
         if (!periodId) continue;
 
         const amount = parseAmount(colData[i]?.value);
@@ -133,13 +167,12 @@ async function walkRows(params: WalkRowsParams) {
 }
 
 /**
- * Loads a tabular Profit and Loss report (GAAP basis) into the database for a company.
- *
- * For each report:
- *   - Upserts periods from columns metadata
- *   - Upserts the report header
- *   - Removes previous accounts and values for this report
- *   - Recursively walks rows to create account hierarchy and populate values
+ * Loads a tabular report into the database for a company.
+ * Steps:
+ *  1) Upsert Periods from column metadata (by ColKey; skip "Total").
+ *  2) Upsert ReportHeader.
+ *  3) Wipe previous accounts/values for the header.
+ *  4) Walk rows to create account tree + values.
  */
 export async function loadTableReport(data: TableReportJsonType, companyId: number) {
   // Extract header, columns, and root rows from data
@@ -147,24 +180,31 @@ export async function loadTableReport(data: TableReportJsonType, companyId: numb
   const cols = data.data.Columns?.Column ?? [];
   const rowsRoot = data.data.Rows;
 
-  // Build a map of period label to period DB id for quick lookup during row traversal
+  // 1) Build period map (ColKey -> Period.id)
   const periodMap = new Map<string, number>();
   let periodsCreated = 0;
 
-  // For each column (except the first, which is the row header), upsert the corresponding period
+  // start at 1 to skip the label column
   for (let i = 1; i < cols.length; i++) {
     const col = cols[i];
-    const title = col?.ColTitle ?? '';
-    const start = col?.MetaData?.find((m) => m.Name === 'StartDate')?.Value;
-    const end = col?.MetaData?.find((m) => m.Name === 'EndDate')?.Value;
-    if (!start || !end || !title) continue;
+    if (!col) continue;
+
+    const title = col.ColTitle ?? '';
+    const colKey = col.MetaData?.find((m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER)?.Value; // stable key
+    const start = col.MetaData?.find(
+      (m) => m.Name?.toLowerCase() === START_DATE_COL_IDENTIFIER,
+    )?.Value;
+    const end = col.MetaData?.find((m) => m.Name?.toLowerCase() === END_DATE_COL_IDENTIFIER)?.Value;
+
+    if (!colKey || colKey.toLowerCase() === TOTAL_COL_IDENTIFIER) continue; // don't make a Period for "Total"
+    if (!start || !end) continue;
 
     const period = await upsertPeriod(new Date(start), new Date(end), title);
-    periodMap.set(title, period.id);
+    periodMap.set(colKey, period.id);
     periodsCreated++;
   }
 
-  // Parse the start and end period for the report header
+  // 2) Upsert ReportHeader
   const startPeriod = new Date(header.StartPeriod);
   const endPeriod = new Date(header.EndPeriod);
 
@@ -191,19 +231,18 @@ export async function loadTableReport(data: TableReportJsonType, companyId: numb
     },
   });
 
-  // Clean up previous accounts/values for this report, then insert new data in a transaction
+  // 3) Wipe previous data + 4) Rebuild tree/values
   await prisma.$transaction(async (tx) => {
     // Find all account IDs for this report to prepare for cleanup
-    const accountIds = await tx.reportAccount.findMany({
+    const existingAccountIds = await tx.reportAccount.findMany({
       where: { reportId: report.id },
       select: { id: true },
     });
 
     // Remove all previous account values and accounts for this report to avoid stale data
-    if (accountIds.length) {
-      await tx.reportAccountValue.deleteMany({
-        where: { accountId: { in: accountIds.map((a) => a.id) } },
-      });
+    if (existingAccountIds.length) {
+      const accountIds = existingAccountIds.map((a) => a.id);
+      await tx.reportAccountValue.deleteMany({ where: { accountId: { in: accountIds } } });
       await tx.reportAccount.deleteMany({ where: { reportId: report.id } });
     }
 
