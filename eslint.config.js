@@ -8,13 +8,13 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
-import tsEslint from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
-export default tsEslint.config(
-  // ---- Global ignores
+export default tseslint.config(
+  // ---------- Global ignores ----------
   globalIgnores(['**/dist', 'coverage', '**/.vite', '**/.turbo', '**/.next']),
 
-  // ---- Base JS
+  // ---------- Global JS ----------
   {
     files: ['**/*.{js,cjs,mjs}'],
     languageOptions: {
@@ -34,37 +34,28 @@ export default tsEslint.config(
     },
   },
 
-  // ---- TypeScript
+  // ---------- Global TypeScript ----------
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['apps/frontend/**/*', 'apps/backend/**/*', 'packages/types/**/*'],
     languageOptions: {
-      parser: tsEslint.parser,
+      parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
-        project: [
-          './tsconfig.base.json',
-          './packages/types/tsconfig.json',
-          './apps/backend/tsconfig.json',
-          './apps/frontend/tsconfig.json',
-        ],
+        project: ['./tsconfig.base.json'],
       },
       globals: { ...globals.browser, ...globals.node },
     },
     plugins: {
-      '@typescript-eslint': tsEslint.plugin,
+      '@typescript-eslint': tseslint.plugin,
       import: importPlugin,
       prettier: prettierPlugin,
       'simple-import-sort': simpleImportSort,
     },
-    extends: [...tsEslint.configs.recommendedTypeChecked, ...tsEslint.configs.stylisticTypeChecked],
-    settings: {
-      'import/resolver': {
-        typescript: { project: ['packages/types/tsconfig.json', 'apps/*/tsconfig.json'] },
-      },
-    },
+    extends: [...tseslint.configs.recommendedTypeChecked, ...tseslint.configs.stylisticTypeChecked],
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
@@ -77,24 +68,36 @@ export default tsEslint.config(
     },
   },
 
-  // ---- Backend rules
   {
     files: ['apps/backend/**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: ['apps/backend/tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      globals: { ...globals.node },
+    },
+    settings: {
+      'import/resolver': { typescript: { project: ['apps/backend/tsconfig.json'] } },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      import: importPlugin,
+      'simple-import-sort': simpleImportSort,
+    },
     rules: {
-      // TODO: work on the types
-      '@typescript-eslint/array-type': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-misused-promises': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      'import/order': 'off',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
 
-  // ---- Frontend rules
+  // ---------- Frontend (React app) ----------
   {
     files: ['apps/frontend/**/*.{ts,tsx,js,jsx}'],
     plugins: {
@@ -103,11 +106,23 @@ export default tsEslint.config(
       'react-refresh': reactRefresh,
     },
     languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: ['apps/frontend/tsconfig.app.json', 'apps/frontend/tsconfig.node.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: globals.browser,
     },
-    settings: { react: { version: 'detect' } },
+    settings: {
+      react: { version: 'detect' },
+      'import/resolver': {
+        typescript: {
+          project: ['apps/frontend/tsconfig.app.json', 'apps/frontend/tsconfig.node.json'],
+        },
+      },
+    },
     rules: {
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
@@ -118,12 +133,44 @@ export default tsEslint.config(
     },
   },
 
-  // ---- Tests
+  // ---------- Types package (generated zod/prisma types) ----------
+  {
+    files: ['packages/types/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: ['packages/types/tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    settings: {
+      'import/resolver': { typescript: { project: ['packages/types/tsconfig.json'] } },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      'simple-import-sort': simpleImportSort,
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-exports': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+    },
+  },
+
+  // ---------- Tests ----------
   {
     files: ['**/*.{test,spec}.{ts,tsx,js,jsx}'],
-    languageOptions: {
-      globals: { ...globals.node, ...globals.jest },
-    },
+    languageOptions: { globals: { ...globals.node, ...globals.jest } },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -132,6 +179,6 @@ export default tsEslint.config(
     },
   },
 
-  // ---- Prettier
+  // ---------- Prettier  ----------
   prettier,
 );
