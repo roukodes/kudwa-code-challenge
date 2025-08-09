@@ -1,0 +1,183 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearchPostgres", "postgresqlExtensions"]
+}
+
+generator zod {
+    provider         = "zod-prisma-types"
+    output           = "../../../packages/types/src"
+    useMultipleFiles = true
+}
+
+// ---------- ENUMS ----------
+
+enum StatementCategoryType {
+    REVENUE
+    COGS
+    OPERATING_REVENUE
+    NON_OPERATING_REVENUE
+    OPERATING_EXPENSE
+    NON_OPERATING_EXPENSE
+}
+
+enum ReportAccountType {
+    INCOME
+    EXPENSE
+    COGS
+    OTHER
+}
+
+// ---------- MODELS ----------
+
+model Company {
+    id        Int       @id @default(autoincrement())
+    name      String?
+    currency  String?
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+
+    // Relations
+    statements Statement[]
+    reports    ReportHeader[]
+}
+
+model Period {
+    id        Int      @id @default(autoincrement())
+    startDate DateTime
+    endDate   DateTime
+    label     String
+
+    // Relations
+    statements   Statement[]
+    reportValues ReportAccountValue[]
+
+    // Indices
+    @@unique([startDate, endDate])
+    @@index([label])
+}
+
+model StatementCategory {
+    id          Int                   @id @default(autoincrement())
+    statementId Int
+    type        StatementCategoryType
+    name        String
+    totalValue  Float?
+
+    // Relations
+    statement Statement           @relation(fields: [statementId], references: [id])
+    lineItems StatementLineItem[]
+
+    // Indices
+    @@index([statementId, type])
+}
+
+model StatementLineItem {
+    id               Int     @id @default(autoincrement())
+    categoryId       Int
+    parentLineItemId Int?
+    name             String
+    value            Float?
+    accountId        String?
+
+    // Relations
+    category       StatementCategory   @relation(fields: [categoryId], references: [id])
+    parentLineItem StatementLineItem?  @relation("LineItemHierarchy", fields: [parentLineItemId], references: [id])
+    childLineItems StatementLineItem[] @relation("LineItemHierarchy")
+    AccountMapping AccountMapping[]
+}
+
+model Statement {
+    id                  Int       @id @default(autoincrement())
+    companyId           Int
+    periodId            Int
+    rootfiId            Int
+    grossProfit         Float?
+    operatingProfit     Float?
+    netProfit           Float?
+    earningsBeforeTaxes Float?
+    taxes               Float?
+    customFields        Json?
+    createdAt           DateTime? @default(now())
+    updatedAt           DateTime? @updatedAt
+
+    // Relations
+    company    Company             @relation(fields: [companyId], references: [id])
+    period     Period              @relation(fields: [periodId], references: [id])
+    categories StatementCategory[]
+
+    // Indices
+    @@unique([companyId, periodId])
+    @@index([companyId, periodId])
+}
+
+model ReportHeader {
+    id          Int      @id @default(autoincrement())
+    companyId   Int
+    reportName  String
+    basis       String
+    startPeriod DateTime
+    endPeriod   DateTime
+    currency    String?
+    options     Json?
+
+    // Relations
+    company  Company         @relation(fields: [companyId], references: [id])
+    accounts ReportAccount[]
+
+    // Indices
+    @@unique([companyId, startPeriod, endPeriod])
+    @@index([companyId])
+}
+
+model ReportAccountValue {
+    id        Int    @id @default(autoincrement())
+    accountId Int
+    periodId  Int
+    amount    Float?
+
+    // Relations
+    account ReportAccount @relation(fields: [accountId], references: [id])
+    period  Period        @relation(fields: [periodId], references: [id])
+
+    // Indices
+    @@unique([accountId, periodId], name: "accountId_periodId")
+    @@index([periodId])
+}
+
+model AccountMapping {
+    id                  Int     @id @default(autoincrement())
+    statementLineItemId Int
+    reportAccountId     Int
+    notes               String?
+
+    // Relations
+    statementLineItem StatementLineItem @relation(fields: [statementLineItemId], references: [id])
+    reportAccount     ReportAccount     @relation(fields: [reportAccountId], references: [id])
+
+    // Indices
+    @@index([statementLineItemId, reportAccountId])
+}
+
+model ReportAccount {
+    id              Int                @id @default(autoincrement())
+    reportId        Int
+    accountName     String
+    parentAccountId Int?
+    type            ReportAccountType?
+
+    // Relations
+    report         ReportHeader         @relation(fields: [reportId], references: [id])
+    parentAccount  ReportAccount?       @relation("AccountHierarchy", fields: [parentAccountId], references: [id])
+    childAccounts  ReportAccount[]      @relation("AccountHierarchy")
+    values         ReportAccountValue[]
+    AccountMapping AccountMapping[]
+
+    // Indices
+    @@index([reportId, type])
+    @@index([accountName])
+}

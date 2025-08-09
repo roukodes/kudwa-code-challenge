@@ -8,7 +8,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 
 export default tsEslint.config([
-  globalIgnores(['dist', 'coverage']),
+  globalIgnores(['**/dist', 'coverage']),
 
   // Base JS rules
   {
@@ -33,7 +33,7 @@ export default tsEslint.config([
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: ['./tsconfig.base.json'],
+        project: ['./tsconfig.base.json', './packages/types/tsconfig.json'],
       },
     },
     plugins: {
