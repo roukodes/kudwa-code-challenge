@@ -106,6 +106,7 @@ export default tseslint.config(
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       '@tanstack/query': tanstackQuery,
+      'simple-import-sort': simpleImportSort,
     },
     languageOptions: {
       parser: tseslint.parser,
@@ -132,6 +133,8 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
     },
   },
 
