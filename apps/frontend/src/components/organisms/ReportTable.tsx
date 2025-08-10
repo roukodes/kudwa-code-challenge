@@ -1,16 +1,14 @@
 import type { GetReportTreeResponse } from '@kudwa-code-challenge/types';
 import {
   Alert,
-  Box,
-  CircularProgress,
   Paper,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
 
 import ReportTableRow from '@/components/molecules/ReportTableRow';
@@ -24,12 +22,7 @@ interface ReportTableProps {
 
 function ReportTable({ isLoading, isError, reportDetails, currency }: ReportTableProps) {
   if (isLoading) {
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        <CircularProgress size={20} />
-        <Typography>Loading…</Typography>
-      </Box>
-    );
+    return <Skeleton variant="rectangular" height={200} />;
   }
 
   if (isError) {

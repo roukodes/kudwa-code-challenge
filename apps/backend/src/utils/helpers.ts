@@ -1,4 +1,4 @@
-import { GetTrendsQueryType } from '@kudwa-code-challenge/validators';
+import type { GetTrendsQueryType } from '@kudwa-code-challenge/validators';
 import { ReportAccountType, StatementCategoryType } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
@@ -10,6 +10,20 @@ export function loadJsonFile<T>(relativePath: string): T {
   const p = path.join(process.cwd(), relativePath);
   const raw = fs.readFileSync(p, 'utf8');
   return JSON.parse(raw) as T;
+}
+
+/**
+ * Load JSON from an external URL.
+ */
+export async function loadJsonRemote<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, {
+    ...init,
+    headers: { accept: 'application/json', ...(init?.headers || {}) },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+  }
+  return (await res.json()) as T;
 }
 
 /**
@@ -31,25 +45,41 @@ export function dateToLabel(
 /**
  * Build tree from flat array.
  */
-export function buildTree<T>(
-  items: Array<T>,
-  identifier = 'id',
-  childrenIdentifier = 'children',
-  parentIdentifier = 'parentLineItemId',
-) {
-  const map = new Map<number, T>();
+export function buildTree<T extends Record<string, any>>(
+  items: T[],
+  identifier: keyof T = 'id',
+  childrenIdentifier: string = 'children',
+  parentIdentifier: keyof T = 'parentLineItemId',
+): T[] {
+  const map = new Map<any, T>();
+
   const roots: T[] = [];
-  items.forEach((n) => map.set(n[identifier], { ...n, [childrenIdentifier]: [] as T[] }));
-  items.forEach((n) => {
-    if (n[parentIdentifier] && map.has(n[parentIdentifier])) {
-      map.get(n[parentIdentifier])[childrenIdentifier].push(map.get(n[identifier]));
+
+  // Step 1: Clone items and assign empty children array
+  items.forEach((item) => {
+    const clone = { ...item, [childrenIdentifier]: [] };
+    map.set(item[identifier], clone);
+  });
+
+  // Step 2: Build the tree
+  items.forEach((item) => {
+    const parentId = item[parentIdentifier];
+    const node = map.get(item[identifier]);
+
+    if (parentId && map.has(parentId)) {
+      const parent = map.get(parentId);
+      if (parent) {
+        parent[childrenIdentifier].push(node);
+      }
     } else {
-      roots.push(map.get(n[identifier]));
+      if (node) {
+        roots.push(node);
+      }
     }
   });
+
   return roots;
 }
-
 /**
  * Convert a string to a ReportAccountType.
  */
