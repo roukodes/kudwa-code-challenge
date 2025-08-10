@@ -2,10 +2,10 @@ import { Router } from 'express';
 
 import { asyncHandler, success } from '@/middleware/response';
 import { validate } from '@/middleware/validate';
-import { getReportDetails, listReports } from '@/services/report.service';
+import { getReportDetailsService, listReportsService } from '@/services/report.service';
 import { ReportByIdParams } from '@/validators/report.validator';
 
-const router = Router();
+const reportRouter = Router();
 
 /**
  * @openapi
@@ -25,12 +25,29 @@ const router = Router();
  *                   properties:
  *                     data:
  *                       type: array
- *                       items: { $ref: '#/components/schemas/ReportHeader' }
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           name:
+ *                             type: string
+ *                           basis:
+ *                             type: string
+ *                           endPeriod:
+ *                             type: string
+ *                             format: date-time
+ *                           startPeriod:
+ *                             type: string
+ *                             format: date-time
+ *                           currency:
+ *                             type: string
+ *                             nullable: true
  */
-router.get(
+reportRouter.get(
   '/',
   asyncHandler(async (_req, res) => {
-    const data = await listReports();
+    const data = await listReportsService();
     return success(res, data);
   }),
 );
@@ -57,17 +74,54 @@ router.get(
  *                 - type: object
  *                   properties:
  *                     data:
- *                       type: array
+ *                       type: object
+ *                       properties:
+ *                         columns:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               key:
+ *                                 type: string
+ *                               label:
+ *                                 type: string
+ *                         nodes:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               accountId:
+ *                                 type: integer
+ *                               name:
+ *                                 type: string
+ *                               type:
+ *                                 type: string
+ *                                 enum: [INCOME, EXPENSE, COGS, OTHER]
+ *                                 nullable: true
+ *                               parentAccountId:
+ *                                 type: integer
+ *                                 nullable: true
+ *                               hasChildren:
+ *                                 type: boolean
+ *                               values:
+ *                                 type: object
+ *                                 additionalProperties:
+ *                                   type: number
+ *                                   nullable: true
+ *                               children:
+ *                                 type: array
+ *                                 items:
+ *                                   $ref: '#/components/schemas/AccountNodeDTO'
  *                       items: { $ref: '#/components/schemas/ReportNode' }
  */
-router.get(
+reportRouter.get(
   '/:reportId',
   validate(ReportByIdParams, 'params'),
   asyncHandler(async (req, res) => {
     const params = ReportByIdParams.parse(req._params);
-    const data = await getReportDetails(params.reportId);
+    const data = await getReportDetailsService(params.reportId);
     return success(res, data);
   }),
 );
 
-export default router;
+export default reportRouter;

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ======== Reports List ========
 
-export const ReportsDTOSchema = z.object({
+export const ReportsSchema = z.object({
   id: z.number(),
   name: z.string(),
   basis: z.string(),
@@ -16,16 +16,16 @@ export const ReportsDTOSchema = z.object({
    */
 });
 
-export type ReportsDTO = z.infer<typeof ReportsDTOSchema>;
+export type ReportsDTO = z.infer<typeof ReportsSchema>;
 
 // ======== Reports Details ========
 
-export const TableColumnDTOSchema = z.object({
+export const TableColumnSchema = z.object({
   key: z.string(),
   label: z.string(),
 });
 
-export type TableColumnDTO = z.infer<typeof TableColumnDTOSchema>;
+export type TableColumnDTO = z.infer<typeof TableColumnSchema>;
 
 export type AccountNodeDTO = {
   accountId: number;
@@ -37,7 +37,7 @@ export type AccountNodeDTO = {
   children: AccountNodeDTO[];
 };
 
-export const AccountNodeDTOSchema: z.ZodType<any> = z.lazy(() =>
+export const AccountNodeSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
     accountId: z.number(),
     name: z.string(),
@@ -45,13 +45,13 @@ export const AccountNodeDTOSchema: z.ZodType<any> = z.lazy(() =>
     parentAccountId: z.number().nullable().optional(),
     hasChildren: z.boolean(),
     values: z.record(z.string(), z.number().nullable()),
-    children: z.array(AccountNodeDTOSchema),
+    children: z.array(AccountNodeSchema),
   }),
 );
 
 export const GetReportTreeResponseSchema = z.object({
-  columns: z.array(TableColumnDTOSchema),
-  nodes: z.array(AccountNodeDTOSchema),
+  columns: z.array(TableColumnSchema),
+  nodes: z.array(AccountNodeSchema),
 });
 
 export type GetReportTreeResponse = z.infer<typeof GetReportTreeResponseSchema>;

@@ -13,7 +13,7 @@ import type { ReportByIdParamsType } from '@/validators/report.validator';
 /**
  * Retrieves a list of all reports
  */
-export async function listReports() {
+export async function listReportsService() {
   const reports = await prisma.reportHeader.findMany({
     orderBy: [{ startPeriod: 'desc' }],
   });
@@ -33,7 +33,7 @@ export async function listReports() {
 /**
  * Retrieves a report's details and builds a grid of accounts + values for each period
  */
-export async function getReportDetails(reportId: ReportByIdParamsType['reportId']) {
+export async function getReportDetailsService(reportId: ReportByIdParamsType['reportId']) {
   // 1) Load accounts + values
   const accounts = await prisma.reportAccount.findMany({
     where: { reportId },

@@ -10,14 +10,6 @@ export const API_STATUS_CODES = {
   SERVER_ERROR: 500,
 };
 
-export const ACCOUNT_TYPE_MAP: Record<string, ReportAccountType> = {
-  Income: 'INCOME',
-  Expenses: 'EXPENSE',
-  COGS: 'COGS',
-  OtherIncome: 'OTHER',
-  OtherExpenses: 'OTHER',
-};
-
 // kept as lowercase for comparison
 export const COL_KEY_IDENTIFIER = 'colkey';
 export const TOTAL_COL_IDENTIFIER = 'total';

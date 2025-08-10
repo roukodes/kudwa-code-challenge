@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { asyncHandler, success } from '@/middleware/response';
 import { runETLService } from '@/services/etl.service';
 
-const router = Router();
+const etlRouter = Router();
 
 /**
  * @openapi
@@ -19,7 +19,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/ApiResponse'
  */
-router.post(
+etlRouter.post(
   '/run',
   asyncHandler(async (_req, res) => {
     const result = await runETLService();
@@ -27,4 +27,4 @@ router.post(
   }),
 );
 
-export default router;
+export default etlRouter;
