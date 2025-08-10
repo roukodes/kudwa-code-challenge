@@ -1,4 +1,10 @@
+import { dirname, join } from 'path';
 import swaggerJsdoc from 'swagger-jsdoc';
+import { fileURLToPath } from 'url';
+
+// ESM-safe __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -236,5 +242,8 @@ export const swaggerSpec = swaggerJsdoc({
       },
     },
   },
-  apis: ['src/routes/**/*.ts'],
+  apis:
+    process.env.NODE_ENV === 'production'
+      ? [join(__dirname, 'server.js')]
+      : [join(__dirname, '../src/server.ts')],
 });

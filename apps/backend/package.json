@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "dotenv -e ../../.env -- bunx tsx watch src/server.ts",
-    "build": "tsup src/server.ts --format esm --out-dir dist --clean",
+    "build": "tsup",
     "start": "dotenv -e ../../.env -- node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
     "prisma:migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
-    "prisma:studio": "dotenv -e ../../.env -- prisma studio"
+    "prisma:studio": "dotenv -e ../../.env -- prisma studio",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@kudwa-code-challenge/types": "workspace:*",
@@ -30,10 +32,13 @@
     "@types/morgan": "^1.9.10",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "@types/supertest": "^2.0.16",
     "dotenv-cli": "^10",
     "prisma": "^6.13.0",
+    "supertest": "^6.3.4",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.0"
   }
 }

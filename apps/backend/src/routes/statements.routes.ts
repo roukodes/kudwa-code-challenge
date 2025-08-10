@@ -30,7 +30,7 @@ import {
 
 const statementsRouter = Router();
 
-/**
+/** @preserve
  * @openapi
  * /statements:
  *   get:
@@ -94,7 +94,7 @@ statementsRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /statements/periods:
  *   get:
@@ -143,7 +143,7 @@ statementsRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /statements/summary:
  *   get:
@@ -199,7 +199,7 @@ statementsRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /statements/top-categories:
  *   get:
@@ -259,7 +259,7 @@ statementsRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /statements/trends:
  *   get:
@@ -301,7 +301,7 @@ statementsRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /statements/breakdown:
  *   get:

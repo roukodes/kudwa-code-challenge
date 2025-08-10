@@ -43,12 +43,12 @@ function Layout() {
   }, [getContentWidth]);
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
       {/* Side nav */}
       <Box
         component="nav"
         aria-label="sidebar"
-        sx={{ width: drawerWidth, transition: 'width 200ms linear' }}
+        sx={{ minWidth: drawerWidth, transition: 'width 200ms linear' }}
       >
         <Drawer
           open={isDrawerOpen}
@@ -68,7 +68,10 @@ function Layout() {
         <TopBar contentWidth={contentWidth} toggleDrawer={toggleDrawer} />
 
         {/* Main content */}
-        <Box component="main" sx={{ p: 3, maxWidth: contentWidth }}>
+        <Box
+          component="main"
+          sx={{ p: 3, maxWidth: contentWidth, transition: 'width 200ms linear' }}
+        >
           <Toolbar />
           <Outlet />
         </Box>

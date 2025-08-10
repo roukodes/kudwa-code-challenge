@@ -5,7 +5,7 @@ import { runETLService } from '@/services/etl.service';
 
 const etlRouter = Router();
 
-/**
+/** @preserve
  * @openapi
  * /etl/run:
  *   post:

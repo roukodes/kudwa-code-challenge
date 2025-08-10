@@ -7,7 +7,7 @@ import { getReportDetailsService, listReportsService } from '@/services/report.s
 
 const reportRouter = Router();
 
-/**
+/** @preserve
  * @openapi
  * /reports:
  *   get:
@@ -52,7 +52,7 @@ reportRouter.get(
   }),
 );
 
-/**
+/** @preserve
  * @openapi
  * /reports/{reportId}:
  *   get:
