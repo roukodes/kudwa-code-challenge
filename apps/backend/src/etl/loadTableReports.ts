@@ -90,7 +90,7 @@ async function walkRows(params: WalkRowsParams) {
         reportId,
         name: headerName,
         parentAccountId: parentId,
-        type: convertTypeStringToAccountType(row?.group),
+        type: convertTypeStringToAccountType(row?.group) ?? null,
       });
 
       for (let i = 1; i < colData.length && i < cols.length; i++) {
@@ -135,7 +135,7 @@ async function walkRows(params: WalkRowsParams) {
         name,
         reportId,
         parentAccountId: parentId,
-        type: convertTypeStringToAccountType(row?.type),
+        type: convertTypeStringToAccountType(row?.type) ?? null,
       });
 
       // For each period column (skipping the first, which is the row label), upsert the value for this account and period

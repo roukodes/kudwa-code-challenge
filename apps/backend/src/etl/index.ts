@@ -1,15 +1,21 @@
+import { env } from '@/config';
 import { prisma } from '@/db';
 import type { MonthlyStatementsJsonType, TableReportJsonType } from '@/types/data.types';
 import { COMPANY_ID, COMPANY_NAME } from '@/utils/constants';
-import { loadJsonFile } from '@/utils/helpers';
+import { loadJsonFile, loadJsonRemote } from '@/utils/helpers';
 
 import { loadMonthlyStatements } from './loadMonthlyStatements';
 import { loadTableReport } from './loadTableReports';
 
 export async function runETL() {
-  // TODO: read data from external server (note use typescript-json-schema for types)
-  const monthlyData = loadJsonFile<MonthlyStatementsJsonType>('data/monthly-statements.json');
-  const tableData = loadJsonFile<TableReportJsonType>('data/table-report.json');
+  const [tableData, monthlyData] = await Promise.all([
+    env.ETL_TABLE_REPORT_URL
+      ? loadJsonRemote<TableReportJsonType>(env.ETL_TABLE_REPORT_URL)
+      : Promise.resolve(loadJsonFile<TableReportJsonType>('data/table-report.json')),
+    env.ETL_MONTHLY_STATEMENTS_URL
+      ? loadJsonRemote<MonthlyStatementsJsonType>(env.ETL_MONTHLY_STATEMENTS_URL)
+      : Promise.resolve(loadJsonFile<MonthlyStatementsJsonType>('data/monthly-statements.json')),
+  ]);
 
   const company = await prisma.company.upsert({
     where: { id: COMPANY_ID },

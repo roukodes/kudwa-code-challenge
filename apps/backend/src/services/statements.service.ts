@@ -52,7 +52,9 @@ export async function listStatementsService(
   });
 
   const nextCursor =
-    baseStatements.length === limit ? baseStatements[baseStatements.length - 1].id : null;
+    baseStatements.length === limit
+      ? (baseStatements[baseStatements.length - 1]?.id ?? null)
+      : null;
 
   const toSummary = (s: (typeof baseStatements)[number]): StatementSummaryDTO => ({
     id: s.id,
@@ -190,7 +192,7 @@ export async function getStatementsSummaryService({
 
   const nextCursor =
     isPaginated && limit && statements.length === limit
-      ? statements[statements.length - 1].id
+      ? (statements[statements.length - 1]?.id ?? null)
       : null;
 
   const rows: SummaryRowDTO[] = statements.map((s) => {

@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "../../node_modules/.tmp/tsconfig.backend.tsbuildinfo",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "target": "ESNext",
     "lib": ["ESNext"],
     "types": ["node"],
@@ -15,7 +15,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "verbatimModuleSyntax": false,
     "outDir": "dist"
   }
 }

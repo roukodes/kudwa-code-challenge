@@ -13,8 +13,8 @@
     "prisma:studio": "dotenv -e ../../.env -- prisma studio"
   },
   "dependencies": {
-    "@kudwa-code-challenge/types": "*",
-    "@kudwa-code-challenge/validators": "*",
+    "@kudwa-code-challenge/types": "workspace:*",
+    "@kudwa-code-challenge/validators": "workspace:*",
     "@prisma/client": "^6.13.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
