@@ -4,7 +4,7 @@ This repo is a Bun-based monorepo with two apps and shared packages:
 
 - apps/backend: Express + Prisma (PostgreSQL)
 - apps/frontend: Vite + React (served by Nginx in production)
-- packages/*: shared types and validators
+- packages/\*: shared types and validators
 
 ---
 
@@ -91,26 +91,26 @@ Notes:
 
 ### Steps
 
-1) Install dependencies
+1. Install dependencies
 
 ```bash
 bun install
 ```
 
-2) Configure environment
+2. Configure environment
 
 - Copy `.env.example` to `.env` and set `DATABASE_URL`.
 - Optional: set remote ETL URLs
   - `ETL_TABLE_REPORT_URL`
   - `ETL_MONTHLY_STATEMENTS_URL`
 
-3) Run database migrations
+3. Run database migrations
 
 ```bash
 bun run --filter @kudwa-code-challenge/backend prisma:migrate:dev
 ```
 
-4) Start services
+4. Start services
 
 ```bash
 # Backend (dev)
