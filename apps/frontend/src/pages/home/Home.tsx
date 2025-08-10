@@ -22,7 +22,8 @@ function Home() {
   const {
     id: reportId,
     name: reportName,
-    basis: reportBasis,
+    // TODO: check if report basis is needed
+    // basis: reportBasis,
     currency: reportCurrency,
     endPeriod: reportPeriodEnd,
     startPeriod: reportPeriodStart,
@@ -53,7 +54,6 @@ function Home() {
         <Stack direction="row" alignItems="center" spacing={1}>
           {isScreenLoading ? <CircularProgress size={16} /> : null}
 
-          {!!reportBasis && <Typography variant="h5">{reportBasis}</Typography>}
           {!!reportName && <Typography variant="h5">{reportName}</Typography>}
         </Stack>
 

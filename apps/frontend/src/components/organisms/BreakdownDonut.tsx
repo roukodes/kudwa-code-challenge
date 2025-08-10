@@ -29,7 +29,7 @@ const BREAKDOWN_TYPES = [
 ] as const;
 
 export default function BreakdownDonut({ from, to }: BreakdownDonutProps) {
-  const [type, setType] = useState<(typeof BREAKDOWN_TYPES)[number]>(BREAKDOWN_TYPES[0]);
+  const [type, setType] = useState<(typeof BREAKDOWN_TYPES)[number]>(BREAKDOWN_TYPES[1]);
   const { data, isLoading } = useFetchBreakdown({
     type,
     from,
