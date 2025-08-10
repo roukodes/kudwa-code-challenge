@@ -38,7 +38,12 @@ export default tseslint.config(
   // ---------- Global TypeScript ----------
   {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['apps/frontend/**/*', 'apps/backend/**/*', 'packages/types/**/*'],
+    ignores: [
+      'apps/frontend/**/*',
+      'apps/backend/**/*',
+      'packages/types/**/*',
+      'packages/validators/**/*',
+    ],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -138,7 +143,7 @@ export default tseslint.config(
     },
   },
 
-  // ---------- Types package (generated zod/prisma types) ----------
+  // ---------- Types package ----------
   {
     files: ['packages/types/**/*.{ts,tsx}'],
     languageOptions: {
@@ -150,6 +155,40 @@ export default tseslint.config(
     },
     settings: {
       'import/resolver': { typescript: { project: ['packages/types/tsconfig.json'] } },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+      'simple-import-sort': simpleImportSort,
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-exports': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+    },
+  },
+
+  // ---------- Validators package ----------
+  {
+    files: ['packages/validators/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: ['packages/validators/tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    settings: {
+      'import/resolver': { typescript: { project: ['packages/validators/tsconfig.json'] } },
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,

@@ -7,6 +7,14 @@ import {
   GetTopCategoriesResponseSchema,
   GetTrendsResponseSchema,
 } from '@kudwa-code-challenge/types';
+import {
+  BreakdownQuery,
+  GetTrendsQuery,
+  PeriodsQuery,
+  StatementsListQuery,
+  StatementsSummaryQuery,
+  TopCategoriesQuery,
+} from '@kudwa-code-challenge/validators';
 import { Router } from 'express';
 
 import { asyncHandler, success } from '@/middleware/response';
@@ -19,14 +27,6 @@ import {
   getTrendsService,
   listStatementsService,
 } from '@/services/statements.service';
-import {
-  BreakdownQuery,
-  GetTrendsQuery,
-  PeriodsQuery,
-  StatementsListQuery,
-  StatementsSummaryQuery,
-  TopCategoriesQuery,
-} from '@/validators/statements.validator';
 
 const statementsRouter = Router();
 

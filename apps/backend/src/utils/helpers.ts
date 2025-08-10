@@ -1,8 +1,7 @@
+import { GetTrendsQueryType } from '@kudwa-code-challenge/validators';
 import { ReportAccountType, StatementCategoryType } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
-
-import { GetTrendsQueryType } from '@/validators/statements.validator';
 
 /**
  * Load JSON file from relative path.

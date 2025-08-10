@@ -4,11 +4,11 @@ import type {
   ReportsDTO,
   TableColumnDTO,
 } from '@kudwa-code-challenge/types';
+import type { ReportByIdParamsType } from '@kudwa-code-challenge/validators';
 
 import { prisma } from '@/db';
 import { TOTAL_COL_IDENTIFIER } from '@/utils/constants';
 import { dateToLabel } from '@/utils/helpers';
-import type { ReportByIdParamsType } from '@/validators/report.validator';
 
 /**
  * Retrieves a list of all reports

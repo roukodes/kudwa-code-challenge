@@ -15,10 +15,6 @@ import type {
   TrendsPointDTO,
 } from '@kudwa-code-challenge/types';
 import { PeriodSchema, SummaryRowSchema } from '@kudwa-code-challenge/types';
-import { StatementCategoryType } from '@prisma/client';
-
-import { prisma } from '@/db';
-import { buildTree, sumByType, valueForMetric } from '@/utils/helpers';
 import type {
   BreakdownQueryType,
   GetTrendsQueryType,
@@ -26,7 +22,11 @@ import type {
   StatementsListQueryType,
   StatementsSummaryQueryType,
   TopCategoriesQueryType,
-} from '@/validators/statements.validator';
+} from '@kudwa-code-challenge/validators';
+import { StatementCategoryType } from '@prisma/client';
+
+import { prisma } from '@/db';
+import { buildTree, sumByType, valueForMetric } from '@/utils/helpers';
 
 const STATEMENTS_MAX_LIMIT = 100;
 const STATEMENTS_DEFAULT_LIMIT = 25;

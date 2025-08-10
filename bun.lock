@@ -31,6 +31,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@kudwa-code-challenge/types": "*",
+        "@kudwa-code-challenge/validators": "*",
         "@prisma/client": "^6.13.0",
         "cors": "^2.8.5",
         "express": "^5.1.0",
@@ -62,6 +63,7 @@
         "@emotion/styled": "^11.14.1",
         "@fontsource/roboto": "^5.2.6",
         "@kudwa-code-challenge/types": "*",
+        "@kudwa-code-challenge/validators": "*",
         "@mui/icons-material": "^7.3.1",
         "@mui/material": "^7.3.1",
         "@mui/x-charts": "^8.10.0",
@@ -84,8 +86,19 @@
     },
     "packages/types": {
       "name": "@kudwa-code-challenge/types",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
+        "zod": "^4",
+      },
+      "devDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/validators": {
+      "name": "@kudwa-code-challenge/validators",
+      "version": "0.1.0",
+      "dependencies": {
+        "@kudwa-code-challenge/types": "*",
         "zod": "^4",
       },
       "devDependencies": {
@@ -299,6 +312,8 @@
     "@kudwa-code-challenge/backend": ["@kudwa-code-challenge/backend@workspace:apps/backend"],
 
     "@kudwa-code-challenge/types": ["@kudwa-code-challenge/types@workspace:packages/types"],
+
+    "@kudwa-code-challenge/validators": ["@kudwa-code-challenge/validators@workspace:packages/validators"],
 
     "@mui/core-downloads-tracker": ["@mui/core-downloads-tracker@7.3.1", "", {}, "sha512-+mIK1Z0BhOaQ0vCgOkT1mSrIpEHLo338h4/duuL4TBLXPvUMit732mnwJY3W40Avy30HdeSfwUAAGRkKmwRaEQ=="],
 

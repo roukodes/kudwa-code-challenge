@@ -1,9 +1,9 @@
+import { ReportByIdParams } from '@kudwa-code-challenge/validators';
 import { Router } from 'express';
 
 import { asyncHandler, success } from '@/middleware/response';
 import { validate } from '@/middleware/validate';
 import { getReportDetailsService, listReportsService } from '@/services/report.service';
-import { ReportByIdParams } from '@/validators/report.validator';
 
 const reportRouter = Router();
 
