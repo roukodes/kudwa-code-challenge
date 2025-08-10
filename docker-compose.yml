@@ -1,0 +1,66 @@
+x-postgres-env: &postgres_env
+  POSTGRES_DB: kudwa_db
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kudwa_db
+    environment:
+      <<: *postgres_env
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: kudwa_backend
+    environment:
+      PORT: "3000"
+      HOST: 0.0.0.0
+      # Point Prisma to the Postgres container
+      DATABASE_URL: postgres://postgres:postgres@db:5432/kudwa_db
+      # Optional ETL remotes (fallback to local data if not set)
+      # ETL_TABLE_REPORT_URL: "https://example.com/table-report.json"
+      # ETL_MONTHLY_STATEMENTS_URL: "https://example.com/monthly-statements.json"
+      # CORS_ORIGIN is not strictly needed when frontend proxies /api via Nginx
+      CORS_ORIGIN: http://localhost:8080
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        # Frontend will call /api; Nginx proxies to backend
+        VITE_API_URL: /api
+    container_name: kudwa_frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
