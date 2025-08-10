@@ -90,85 +90,92 @@ export async function loadMonthlyStatements(
   // Process each monthly statement for the given company
   for (const statementRaw of monthlyStatements.data) {
     // Use a transaction to ensure all related DB operations for this statement are atomic
-    await prisma.$transaction(async (transaction) => {
-      // Ensure the period exists or create it if missing (idempotent upsert)
-      const period = await upsertPeriod(
-        new Date(statementRaw.period_start),
-        new Date(statementRaw.period_end),
-      );
+    await prisma.$transaction(
+      async (transaction) => {
+        // Ensure the period exists or create it if missing (idempotent upsert)
+        const period = await upsertPeriod(
+          new Date(statementRaw.period_start),
+          new Date(statementRaw.period_end),
+        );
 
-      // Upsert the statement for this period and company (either updates or creates)
-      const statementRecord = await transaction.statement.upsert({
-        where: { companyId_periodId: { companyId, periodId: period.id } },
-        update: {
-          grossProfit: statementRaw.gross_profit ?? undefined,
-          operatingProfit: statementRaw.operating_profit ?? undefined,
-          netProfit: statementRaw.net_profit ?? undefined,
-          earningsBeforeTaxes: statementRaw.earnings_before_taxes ?? undefined,
-          taxes: statementRaw.taxes ?? undefined,
-          customFields: statementRaw.custom_fields ?? undefined,
-        },
-        create: {
-          rootfiId: statementRaw.rootfi_id ?? undefined,
-          company: { connect: { id: companyId } },
-          period: { connect: { id: period.id } },
-          grossProfit: statementRaw.gross_profit ?? undefined,
-          operatingProfit: statementRaw.operating_profit ?? undefined,
-          netProfit: statementRaw.net_profit ?? undefined,
-          earningsBeforeTaxes: statementRaw.earnings_before_taxes ?? undefined,
-          taxes: statementRaw.taxes ?? undefined,
-          customFields: statementRaw.custom_fields ?? undefined,
-        },
-      });
-
-      // Find all existing categories for this statement to handle clean-up
-      const existingCategories = await transaction.statementCategory.findMany({
-        where: { statementId: statementRecord.id },
-        select: { id: true },
-      });
-
-      // If categories exist, remove all their line items and then the categories themselves to avoid stale data
-      if (existingCategories.length) {
-        await transaction.statementLineItem.deleteMany({
-          where: { categoryId: { in: existingCategories.map((c) => c.id) } },
+        // Upsert the statement for this period and company (either updates or creates)
+        const statementRecord = await transaction.statement.upsert({
+          where: { companyId_periodId: { companyId, periodId: period.id } },
+          update: {
+            grossProfit: statementRaw.gross_profit ?? undefined,
+            operatingProfit: statementRaw.operating_profit ?? undefined,
+            netProfit: statementRaw.net_profit ?? undefined,
+            earningsBeforeTaxes: statementRaw.earnings_before_taxes ?? undefined,
+            taxes: statementRaw.taxes ?? undefined,
+            customFields: statementRaw.custom_fields ?? undefined,
+          },
+          create: {
+            rootfiId: statementRaw.rootfi_id ?? undefined,
+            company: { connect: { id: companyId } },
+            period: { connect: { id: period.id } },
+            grossProfit: statementRaw.gross_profit ?? undefined,
+            operatingProfit: statementRaw.operating_profit ?? undefined,
+            netProfit: statementRaw.net_profit ?? undefined,
+            earningsBeforeTaxes: statementRaw.earnings_before_taxes ?? undefined,
+            taxes: statementRaw.taxes ?? undefined,
+            customFields: statementRaw.custom_fields ?? undefined,
+          },
         });
-        await transaction.statementCategory.deleteMany({
+
+        // Find all existing categories for this statement to handle clean-up
+        const existingCategories = await transaction.statementCategory.findMany({
           where: { statementId: statementRecord.id },
+          select: { id: true },
         });
-      }
 
-      // Insert all categories and their nested line items for each section of the statement.
-      // Each call processes a major section (revenue, COGS, expenses, etc.)
-      await insertCategoriesWithLineItems(
-        statementRaw.revenue ?? [],
-        StatementCategoryType.REVENUE,
-        statementRecord,
-        transaction,
-      );
-      await insertCategoriesWithLineItems(
-        statementRaw.cost_of_goods_sold ?? [],
-        StatementCategoryType.COGS,
-        statementRecord,
-        transaction,
-      );
-      await insertCategoriesWithLineItems(
-        statementRaw.operating_expenses ?? [],
-        StatementCategoryType.OPERATING_EXPENSE,
-        statementRecord,
-        transaction,
-      );
-      await insertCategoriesWithLineItems(
-        statementRaw.non_operating_revenue ?? [],
-        StatementCategoryType.NON_OPERATING_REVENUE,
-        statementRecord,
-        transaction,
-      );
-      await insertCategoriesWithLineItems(
-        statementRaw.non_operating_expenses ?? [],
-        StatementCategoryType.NON_OPERATING_EXPENSE,
-        statementRecord,
-        transaction,
-      );
-    });
+        // If categories exist, remove all their line items and then the categories themselves to avoid stale data
+        if (existingCategories.length) {
+          await transaction.statementLineItem.deleteMany({
+            where: { categoryId: { in: existingCategories.map((c) => c.id) } },
+          });
+          await transaction.statementCategory.deleteMany({
+            where: { statementId: statementRecord.id },
+          });
+        }
+
+        // Insert all categories and their nested line items for each section of the statement.
+        // Each call processes a major section (revenue, COGS, expenses, etc.)
+        await insertCategoriesWithLineItems(
+          statementRaw.revenue ?? [],
+          StatementCategoryType.REVENUE,
+          statementRecord,
+          transaction,
+        );
+        await insertCategoriesWithLineItems(
+          statementRaw.cost_of_goods_sold ?? [],
+          StatementCategoryType.COGS,
+          statementRecord,
+          transaction,
+        );
+        await insertCategoriesWithLineItems(
+          statementRaw.operating_expenses ?? [],
+          StatementCategoryType.OPERATING_EXPENSE,
+          statementRecord,
+          transaction,
+        );
+        await insertCategoriesWithLineItems(
+          statementRaw.non_operating_revenue ?? [],
+          StatementCategoryType.NON_OPERATING_REVENUE,
+          statementRecord,
+          transaction,
+        );
+        await insertCategoriesWithLineItems(
+          statementRaw.non_operating_expenses ?? [],
+          StatementCategoryType.NON_OPERATING_EXPENSE,
+          statementRecord,
+          transaction,
+        );
+      },
+      {
+        // hitting timeout on render
+        timeout: 20_000,
+        maxWait: 10_000,
+      },
+    );
   }
 }

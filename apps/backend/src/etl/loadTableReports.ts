@@ -232,24 +232,31 @@ export async function loadTableReport(data: TableReportJsonType, companyId: numb
   });
 
   // 3) Wipe previous data + 4) Rebuild tree/values
-  await prisma.$transaction(async (tx) => {
-    // Find all account IDs for this report to prepare for cleanup
-    const existingAccountIds = await tx.reportAccount.findMany({
-      where: { reportId: report.id },
-      select: { id: true },
-    });
+  await prisma.$transaction(
+    async (tx) => {
+      // Find all account IDs for this report to prepare for cleanup
+      const existingAccountIds = await tx.reportAccount.findMany({
+        where: { reportId: report.id },
+        select: { id: true },
+      });
 
-    // Remove all previous account values and accounts for this report to avoid stale data
-    if (existingAccountIds.length) {
-      const accountIds = existingAccountIds.map((a) => a.id);
-      await tx.reportAccountValue.deleteMany({ where: { accountId: { in: accountIds } } });
-      await tx.reportAccount.deleteMany({ where: { reportId: report.id } });
-    }
+      // Remove all previous account values and accounts for this report to avoid stale data
+      if (existingAccountIds.length) {
+        const accountIds = existingAccountIds.map((a) => a.id);
+        await tx.reportAccountValue.deleteMany({ where: { accountId: { in: accountIds } } });
+        await tx.reportAccount.deleteMany({ where: { reportId: report.id } });
+      }
 
-    // Recursively walk the report rows to create the account hierarchy and insert values for each period
-    const rows = Array.isArray(rowsRoot?.Row) ? rowsRoot.Row : [];
-    await walkRows({ tx, reportId: report.id, periodMap, cols, rows });
-  });
+      // Recursively walk the report rows to create the account hierarchy and insert values for each period
+      const rows = Array.isArray(rowsRoot?.Row) ? rowsRoot.Row : [];
+      await walkRows({ tx, reportId: report.id, periodMap, cols, rows });
+    },
+    // hitting timeout on render
+    {
+      timeout: 20_000,
+      maxWait: 10_000,
+    },
+  );
 
   // Return the report ID and number of periods created
   return { reportId: report.id, periodsCreated };
