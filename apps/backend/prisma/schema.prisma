@@ -8,12 +8,6 @@ generator client {
     previewFeatures = ["fullTextSearchPostgres", "postgresqlExtensions"]
 }
 
-generator zod {
-    provider         = "zod-prisma-types"
-    output           = "../../../packages/types/src"
-    useMultipleFiles = true
-}
-
 // ---------- ENUMS ----------
 
 enum StatementCategoryType {

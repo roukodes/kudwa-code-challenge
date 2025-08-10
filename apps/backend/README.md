@@ -69,7 +69,7 @@ The following table explains how each Prisma model maps to the provided JSON dat
 
 - Created local Postgres DB and user.
 - `.env` with `DATABASE_URL` for Prisma.
-- Common types and schemas shared between FE and BE generated with `zod-prisma-types`.
+- Common types and schemas shared between FE and BE.
 - Migrations run with:
   ```bash
   npm run prisma:migrate:dev

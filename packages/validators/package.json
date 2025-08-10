@@ -1,0 +1,24 @@
+{
+  "name": "@kudwa-code-challenge/validators",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist && rm -rf ../../node_modules/.tmp/tsconfig.validators.tsbuildinfo"
+  },
+  "dependencies": {
+    "@kudwa-code-challenge/types": "*",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

@@ -19,46 +19,56 @@ export const swaggerSpec = swaggerJsdoc({
             message: { type: 'string' },
           },
         },
-        ReportHeader: {
+        ReportsDTO: {
           type: 'object',
           properties: {
             id: { type: 'integer' },
-            reportName: { type: 'string' },
-            startPeriod: { type: 'string', format: 'date-time' },
+            name: { type: 'string' },
+            basis: { type: 'string' },
             endPeriod: { type: 'string', format: 'date-time' },
+            startPeriod: { type: 'string', format: 'date-time' },
             currency: { type: 'string', nullable: true },
           },
         },
-        ReportNode: {
+        TableColumn: {
           type: 'object',
           properties: {
-            id: { type: 'integer' },
-            accountName: { type: 'string' },
-            type: { type: 'string', nullable: true },
+            key: { type: 'string' },
+            label: { type: 'string' },
+          },
+        },
+        AccountNode: {
+          type: 'object',
+          properties: {
+            accountId: { type: 'integer' },
+            name: { type: 'string' },
+            type: { type: 'string', enum: ['INCOME', 'EXPENSE', 'COGS', 'OTHER'], nullable: true },
+            parentAccountId: { type: 'integer', nullable: true },
+            hasChildren: { type: 'boolean' },
             values: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  periodId: { type: 'integer' },
-                  label: { type: 'string', nullable: true },
-                  amount: { type: 'number', nullable: true },
-                },
-              },
+              type: 'object',
+              additionalProperties: { type: 'number', nullable: true },
             },
-            children: { type: 'array', items: { $ref: '#/components/schemas/ReportNode' } },
+            children: { type: 'array', items: { $ref: '#/components/schemas/AccountNode' } },
+          },
+        },
+        GetReportTreeResponse: {
+          type: 'object',
+          properties: {
+            columns: { type: 'array', items: { $ref: '#/components/schemas/TableColumn' } },
+            nodes: { type: 'array', items: { $ref: '#/components/schemas/AccountNode' } },
           },
         },
         Period: {
           type: 'object',
           properties: {
             id: { type: 'integer' },
-            label: { type: 'string' },
+            label: { type: 'string', nullable: true },
             startDate: { type: 'string', format: 'date-time' },
             endDate: { type: 'string', format: 'date-time' },
           },
         },
-        Statement: {
+        StatementSummary: {
           type: 'object',
           properties: {
             id: { type: 'integer' },
@@ -68,38 +78,158 @@ export const swaggerSpec = swaggerJsdoc({
             netProfit: { type: 'number', nullable: true },
           },
         },
+        StatementLineItemNode: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            categoryId: { type: 'integer' },
+            parentLineItemId: { type: 'integer', nullable: true },
+            name: { type: 'string' },
+            value: { type: 'number', nullable: true },
+            accountId: { type: 'string', nullable: true },
+            children: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/StatementLineItemNode' },
+            },
+          },
+        },
         StatementCategory: {
           type: 'object',
           properties: {
             id: { type: 'integer' },
             name: { type: 'string' },
-            type: { type: 'string' },
+            type: {
+              type: 'string',
+              enum: [
+                'REVENUE',
+                'COGS',
+                'OPERATING_REVENUE',
+                'NON_OPERATING_REVENUE',
+                'OPERATING_EXPENSE',
+                'NON_OPERATING_EXPENSE',
+              ],
+              nullable: true,
+            },
             totalValue: { type: 'number', nullable: true },
             lineItems: {
               type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: { type: 'integer' },
-                  name: { type: 'string' },
-                  value: { type: 'number', nullable: true },
-                  accountId: { type: 'string', nullable: true },
-                  children: {
-                    type: 'array',
-                    items: { $ref: '#/components/schemas/StatementCategory' },
-                  },
-                },
-              },
+              items: { $ref: '#/components/schemas/StatementLineItemNode' },
             },
           },
         },
-        StatementResponse: {
+        StatementListEntry: {
           type: 'object',
           properties: {
-            statement: { $ref: '#/components/schemas/Statement' },
+            statement: { $ref: '#/components/schemas/StatementSummary' },
             categories: {
               type: 'array',
               items: { $ref: '#/components/schemas/StatementCategory' },
+            },
+          },
+        },
+        ListStatementsResponse: {
+          type: 'object',
+          properties: {
+            items: { type: 'array', items: { $ref: '#/components/schemas/StatementListEntry' } },
+            nextCursor: { type: 'integer', nullable: true },
+          },
+        },
+        SummaryRow: {
+          type: 'object',
+          properties: {
+            periodId: { type: 'integer' },
+            label: { type: 'string', nullable: true },
+            startDate: { type: 'string', format: 'date-time' },
+            endDate: { type: 'string', format: 'date-time' },
+            revenue: { type: 'number' },
+            cogs: { type: 'number' },
+            opex: { type: 'number' },
+            grossProfit: { type: 'number' },
+            operatingProfit: { type: 'number' },
+            netProfit: { type: 'number' },
+            grossMarginPct: { type: 'number' },
+            operatingMarginPct: { type: 'number' },
+            netMarginPct: { type: 'number' },
+          },
+        },
+        GetStatementsSummaryResponse: {
+          type: 'object',
+          properties: {
+            rows: { type: 'array', items: { $ref: '#/components/schemas/SummaryRow' } },
+            nextCursor: { type: 'integer', nullable: true },
+          },
+        },
+        TrendsPoint: {
+          type: 'object',
+          properties: {
+            periodId: { type: 'integer' },
+            label: { type: 'string', nullable: true },
+            startDate: { type: 'string', format: 'date-time' },
+            endDate: { type: 'string', format: 'date-time' },
+            value: { type: 'number' },
+          },
+        },
+        GetTrendsResponse: {
+          type: 'object',
+          properties: {
+            metric: {
+              type: 'string',
+              enum: ['revenue', 'cogs', 'opex', 'grossProfit', 'operatingProfit', 'netProfit'],
+            },
+            points: { type: 'array', items: { $ref: '#/components/schemas/TrendsPoint' } },
+          },
+        },
+        TopCategory: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            type: {
+              type: 'string',
+              enum: [
+                'REVENUE',
+                'COGS',
+                'OPERATING_REVENUE',
+                'NON_OPERATING_REVENUE',
+                'OPERATING_EXPENSE',
+                'NON_OPERATING_EXPENSE',
+              ],
+            },
+            totalValue: { type: 'number' },
+          },
+        },
+        GetTopCategoriesResponse: {
+          type: 'object',
+          properties: {
+            categories: { type: 'array', items: { $ref: '#/components/schemas/TopCategory' } },
+          },
+        },
+        BreakdownCategory: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            value: { type: 'number' },
+          },
+        },
+        GetBreakdownResponse: {
+          type: 'object',
+          properties: {
+            type: {
+              type: 'string',
+              enum: [
+                'REVENUE',
+                'COGS',
+                'OPERATING_REVENUE',
+                'NON_OPERATING_REVENUE',
+                'OPERATING_EXPENSE',
+                'NON_OPERATING_EXPENSE',
+              ],
+            },
+            total: { type: 'number' },
+            categories: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/BreakdownCategory' },
             },
           },
         },

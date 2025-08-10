@@ -1,3 +1,2 @@
-export * from './inputTypeSchemas';
-export * from './modelSchema';
-export * from './outputTypeSchemas';
+export * from './report.dto';
+export * from './statements.dto';
