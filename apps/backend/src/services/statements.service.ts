@@ -1,7 +1,7 @@
-// src/services/statements.service.ts
 import type {
   BreakdownCategoryDTO,
   GetBreakdownResponseDTO,
+  GetStatementsSummaryResponseDTO,
   GetTopCategoriesResponseDTO,
   GetTrendsResponseDTO,
   ListStatementsResponseDTO,
@@ -159,24 +159,39 @@ export async function getPeriodsService({ from, to }: PeriodsQueryType): Promise
 export async function getStatementsSummaryService({
   from,
   to,
-}: StatementsSummaryQueryType): Promise<SummaryRowDTO[]> {
+  cursor,
+  limit: limitParam,
+}: StatementsSummaryQueryType): Promise<GetStatementsSummaryResponseDTO> {
   const withPeriodFilter = from || to;
+  const isPaginated = typeof limitParam === 'number' && Number.isFinite(limitParam);
+  const limit = isPaginated
+    ? Math.min(Math.max(limitParam as number, 1), STATEMENTS_MAX_LIMIT)
+    : undefined;
 
   const statements = await prisma.statement.findMany({
-    where: withPeriodFilter
-      ? {
-          period: {
-            ...(from ? { startDate: { gte: from } } : {}),
-            ...(to ? { endDate: { lte: to } } : {}),
-          },
-        }
-      : {},
+    where: {
+      ...(isPaginated && cursor ? { id: { gt: cursor } } : {}),
+      ...(withPeriodFilter
+        ? {
+            period: {
+              ...(from ? { startDate: { gte: from } } : {}),
+              ...(to ? { endDate: { lte: to } } : {}),
+            },
+          }
+        : {}),
+    },
     include: {
       period: true,
       categories: { select: { type: true, totalValue: true } },
     },
-    orderBy: [{ period: { startDate: 'asc' } }, { id: 'asc' }],
+    orderBy: { id: 'asc' },
+    take: limit,
   });
+
+  const nextCursor =
+    isPaginated && limit && statements.length === limit
+      ? statements[statements.length - 1].id
+      : null;
 
   const rows: SummaryRowDTO[] = statements.map((s) => {
     const revenue = sumByType(s.categories, StatementCategoryType.REVENUE);
@@ -209,7 +224,7 @@ export async function getStatementsSummaryService({
     throw new Error(`SummaryRowDTO validation failed: ${check.error.message}`);
   }
 
-  return rows;
+  return { rows, nextCursor };
 }
 
 /**

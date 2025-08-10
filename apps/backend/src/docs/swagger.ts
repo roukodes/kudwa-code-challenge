@@ -156,6 +156,7 @@ export const swaggerSpec = swaggerJsdoc({
           type: 'object',
           properties: {
             rows: { type: 'array', items: { $ref: '#/components/schemas/SummaryRow' } },
+            nextCursor: { type: 'integer', nullable: true },
           },
         },
         TrendsPoint: {

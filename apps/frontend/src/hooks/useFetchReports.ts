@@ -11,17 +11,10 @@ async function queryFn() {
 }
 
 function useFetchReports() {
-  const {
-    data: reports,
-    isError: isErrorReports,
-    isLoading: isLoadingReports,
-    isRefetching: isRefetchingReports,
-  } = useQuery({
+  return useQuery({
     queryFn,
-    queryKey: QUERY_KEYS.REPORTS.ALL,
+    queryKey: QUERY_KEYS.REPORTS.LIST,
   });
-
-  return { reports, isLoadingReports, isRefetchingReports, isErrorReports };
 }
 
 export default useFetchReports;

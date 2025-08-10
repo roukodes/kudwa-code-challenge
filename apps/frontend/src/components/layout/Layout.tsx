@@ -1,5 +1,5 @@
 import { Box, Drawer, Toolbar, useMediaQuery } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
 
 import SideDrawer from '@/components/layout/SideDrawer';
@@ -11,6 +11,7 @@ function Layout() {
   const isMobile = useMediaQuery('(max-width:900px)');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [contentWidth, setContentWidth] = useState(window.innerWidth);
 
   const toggleDrawer = () => {
     setIsDrawerOpen((prev) => !prev);
@@ -21,7 +22,25 @@ function Layout() {
   const drawerType = isMobile ? 'temporary' : 'persistent';
 
   const drawerWidth = isDrawerOpen && !isMobile ? DRAWER_WIDTH : 0;
-  const contentWidth = isMobile ? window.innerWidth : window.innerWidth - drawerWidth;
+
+  const getContentWidth = useCallback(
+    () => (isMobile ? window.innerWidth : window.innerWidth - drawerWidth),
+    [isMobile, drawerWidth],
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setContentWidth(getContentWidth());
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [getContentWidth]);
 
   return (
     <Box sx={{ display: 'flex' }}>

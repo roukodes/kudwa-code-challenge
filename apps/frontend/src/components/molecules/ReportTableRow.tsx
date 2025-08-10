@@ -64,7 +64,7 @@ function ReportTableRow({ node, columns, depth, currency }: RowProps) {
             columns={columns}
             depth={depth + 1}
             currency={currency}
-            defaultExpanded={false} // or true if you want deeper levels open by default
+            defaultExpanded={false}
           />
         ))}
     </>

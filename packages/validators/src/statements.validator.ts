@@ -27,8 +27,13 @@ export type PeriodsQueryType = z.infer<typeof PeriodsQuery>;
 
 /* ================= SUMMARY ================= */
 
-/** GET /statements/summary?from=&to= */
-export const StatementsSummaryQuery = CoercedDateRange;
+/** GET /statements/summary?from=&to=&limit=&cursor= */
+export const StatementsSummaryQuery = CoercedDateRange.and(
+  z.object({
+    limit: z.coerce.number().int().min(1).max(100).default(25).optional(),
+    cursor: z.coerce.number().int().positive().optional().optional(),
+  }),
+);
 export type StatementsSummaryQueryType = z.infer<typeof StatementsSummaryQuery>;
 
 /* ================= TRENDS ================= */

@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import ReportTableRow from '@/components/atoms/ReportTableRow';
+import ReportTableRow from '@/components/molecules/ReportTableRow';
 
 interface ReportTableProps {
   isLoading: boolean;

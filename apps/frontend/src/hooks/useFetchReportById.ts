@@ -11,18 +11,11 @@ async function queryFn({ id }: { id: number }) {
 }
 
 function useFetchReportById({ id }: { id: number }) {
-  const {
-    data: reportDetails,
-    isError: isErrorReportById,
-    isLoading: isLoadingReportById,
-    isRefetching: isRefetchingReportById,
-  } = useQuery({
+  return useQuery({
     enabled: !!id,
     queryFn: () => queryFn({ id }),
-    queryKey: QUERY_KEYS.REPORTS.ID(id),
+    queryKey: QUERY_KEYS.REPORTS.BY_ID(id),
   });
-
-  return { reportDetails, isLoadingReportById, isRefetchingReportById, isErrorReportById };
 }
 
 export default useFetchReportById;

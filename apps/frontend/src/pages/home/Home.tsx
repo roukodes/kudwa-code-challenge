@@ -4,14 +4,19 @@ import { Chip, CircularProgress, IconButton, Stack, Tooltip, Typography } from '
 import { useMemo } from 'react';
 
 import { invalidateQueries } from '@/clients/query.client';
-import ReportTable from '@/components/molecules/ReportTable';
+import ReportTable from '@/components/organisms/ReportTable';
 import useFetchReportById from '@/hooks/useFetchReportById';
 import useFetchReports from '@/hooks/useFetchReports';
 import QUERY_KEYS from '@/services/queryKeys';
 import { dateToLabel } from '@/utils/helpers';
 
 function Home() {
-  const { reports, isLoadingReports, isRefetchingReports, isErrorReports } = useFetchReports();
+  const {
+    data: reports,
+    isError: isErrorReports,
+    isLoading: isLoadingReports,
+    isRefetching: isRefetchingReports,
+  } = useFetchReports();
 
   // We are filtering out to the latest report
   const {
@@ -23,14 +28,18 @@ function Home() {
     startPeriod: reportPeriodStart,
   } = useMemo(() => reports?.[0] ?? ({} as ReportsDTO), [reports]);
 
-  const { reportDetails, isLoadingReportById, isRefetchingReportById, isErrorReportById } =
-    useFetchReportById({
-      id: reportId,
-    });
+  const {
+    data: reportDetails,
+    isError: isErrorReportById,
+    isLoading: isLoadingReportById,
+    isRefetching: isRefetchingReportById,
+  } = useFetchReportById({
+    id: reportId,
+  });
 
   const handleRefresh = () => {
-    invalidateQueries(QUERY_KEYS.REPORTS.ALL);
-    invalidateQueries(QUERY_KEYS.REPORTS.ID(reportId));
+    invalidateQueries(QUERY_KEYS.REPORTS.LIST);
+    invalidateQueries(QUERY_KEYS.REPORTS.BY_ID(reportId));
   };
 
   const isError = isErrorReports || isErrorReportById;

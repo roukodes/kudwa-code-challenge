@@ -139,7 +139,7 @@ statementsRouter.get(
       return res.status(500).json({ error: check.error.flatten() });
     }
 
-    return success(res, periods);
+    return success(res, payload);
   }),
 );
 
@@ -160,6 +160,16 @@ statementsRouter.get(
  *         required: false
  *         schema: { type: string, format: date }
  *         description: End date (inclusive) YYYY-MM-DD
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema: { type: integer, minimum: 1, maximum: 100 }
+ *         description: Page size (default 25)
+ *       - in: query
+ *         name: cursor
+ *         required: false
+ *         schema: { type: integer }
+ *         description: Use the last `id` from the previous page to fetch the next page
  *     responses:
  *       200:
  *         description: OK
@@ -171,24 +181,21 @@ statementsRouter.get(
  *                 - type: object
  *                   properties:
  *                     data:
- *                       type: array
- *                       items:
- *                         $ref: '#/components/schemas/StatementsSummaryRow'
+ *                       $ref: '#/components/schemas/GetStatementsSummaryResponse'
  */
 statementsRouter.get(
   '/summary',
   validate(StatementsSummaryQuery, 'query'),
   asyncHandler(async (req, res) => {
     const q = StatementsSummaryQuery.parse((req as any)._query);
-    const rows = await getStatementsSummaryService(q);
+    const payload: GetStatementsSummaryResponseDTO = await getStatementsSummaryService(q);
 
-    const payload: GetStatementsSummaryResponseDTO = { rows };
     const check = GetStatementsSummaryResponseSchema.safeParse(payload);
     if (!check.success) {
       return res.status(500).json({ error: check.error.flatten() });
     }
 
-    return success(res, rows);
+    return success(res, payload);
   }),
 );
 
@@ -241,14 +248,14 @@ statementsRouter.get(
   validate(TopCategoriesQuery, 'query'),
   asyncHandler(async (req, res) => {
     const q = TopCategoriesQuery.parse((req as any)._query);
-    const data = await getTopCategoriesService(q);
+    const payload = await getTopCategoriesService(q);
 
-    const check = GetTopCategoriesResponseSchema.safeParse(data);
+    const check = GetTopCategoriesResponseSchema.safeParse(payload);
     if (!check.success) {
       return res.status(500).json({ error: check.error.flatten() });
     }
 
-    return success(res, data);
+    return success(res, payload);
   }),
 );
 
@@ -335,14 +342,14 @@ statementsRouter.get(
   validate(BreakdownQuery, 'query'),
   asyncHandler(async (req, res) => {
     const q = BreakdownQuery.parse((req as any)._query);
-    const data = await getBreakdownService(q);
+    const payload = await getBreakdownService(q);
 
-    const check = GetBreakdownResponseSchema.safeParse(data);
+    const check = GetBreakdownResponseSchema.safeParse(payload);
     if (!check.success) {
       return res.status(500).json({ error: check.error.flatten() });
     }
 
-    return success(res, data);
+    return success(res, payload);
   }),
 );
 

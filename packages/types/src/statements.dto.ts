@@ -103,6 +103,7 @@ export type SummaryRowDTO = z.infer<typeof SummaryRowSchema>;
 
 export const GetStatementsSummaryResponseSchema = z.object({
   rows: z.array(SummaryRowSchema),
+  nextCursor: z.number().int().positive().nullable(),
 });
 export type GetStatementsSummaryResponseDTO = z.infer<typeof GetStatementsSummaryResponseSchema>;
 
@@ -123,6 +124,7 @@ export const TrendsPointSchema = z.object({
 export type TrendsPointDTO = z.infer<typeof TrendsPointSchema>;
 
 export const GetTrendsResponseSchema = z.object({
+  // TODO: Unify all the trends in a constant globally
   metric: z.enum(['revenue', 'cogs', 'opex', 'grossProfit', 'operatingProfit', 'netProfit']),
   points: z.array(TrendsPointSchema),
 });
