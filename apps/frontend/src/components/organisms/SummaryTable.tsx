@@ -1,4 +1,5 @@
 import {
+  Alert,
   Paper,
   Skeleton,
   Table,
@@ -24,7 +25,7 @@ const ROWS_PER_PAGE = 10;
 export default function SummaryTable({ from, to }: SummaryTableProps) {
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useFetchStatementsSummary({
+  const { data, isLoading, isError } = useFetchStatementsSummary({
     from,
     to,
     limit: ROWS_PER_PAGE,
@@ -37,6 +38,14 @@ export default function SummaryTable({ from, to }: SummaryTableProps) {
 
   if (isLoading) {
     return <Skeleton variant="rectangular" height={200} />;
+  }
+
+  if (isError) {
+    return <Alert severity="error">Failed to load summary. Please try again later.</Alert>;
+  }
+
+  if (!data?.rows?.length) {
+    return <Alert severity="info">No data available for the selected period.</Alert>;
   }
 
   return (

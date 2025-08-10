@@ -1,4 +1,5 @@
 import {
+  Alert,
   Paper,
   Skeleton,
   Table,
@@ -19,7 +20,7 @@ const ROWS_PER_PAGE = 10;
 export default function StatementsTable() {
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useStatementsList({
+  const { data, isLoading, isError } = useStatementsList({
     full: false,
     limit: ROWS_PER_PAGE,
     cursor: page * ROWS_PER_PAGE,
@@ -31,6 +32,14 @@ export default function StatementsTable() {
 
   if (isLoading) {
     return <Skeleton variant="rectangular" height={200} />;
+  }
+
+  if (isError) {
+    return <Alert severity="error">Failed to load statements. Please try again later.</Alert>;
+  }
+
+  if (!data?.items?.length) {
+    return <Alert severity="info">No statements found.</Alert>;
   }
 
   return (
