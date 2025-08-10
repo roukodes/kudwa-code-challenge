@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function invalidateQueries(queryKeys: string[]) {
+function invalidateQueries(queryKeys?: string[]) {
   queryClient.invalidateQueries({ queryKey: queryKeys });
 }
 

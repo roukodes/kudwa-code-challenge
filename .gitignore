@@ -4,6 +4,7 @@ node_modules
 # output
 dist
 tsconfig.tsbuildinfo
+tsconfig.*.tsbuildinfo
 
 # code coverage
 coverage

@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup src/index.ts --format esm --dts --out-dir dist --clean",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist && rm -rf ../../node_modules/.tmp/tsconfig.validators.tsbuildinfo"
   },
@@ -19,6 +19,7 @@
     "zod": "^4"
   },
   "devDependencies": {
+    "tsup": "^8.5.0",
     "typescript": "^5"
   }
 }
