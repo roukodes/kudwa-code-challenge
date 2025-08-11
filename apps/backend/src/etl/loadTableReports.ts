@@ -78,10 +78,20 @@ async function createAccount({ tx, reportId, name, type, parentAccountId }: Crea
  */
 async function walkRows(params: WalkRowsParams) {
   const { tx, reportId, cols, periodMap, rows, parentId } = params;
+
+  const toRowArray = (r?: unknown): ReportRows => {
+    if (!r) return [] as unknown as ReportRows;
+    return Array.isArray(r) ? (r as ReportRows) : ([r] as unknown as ReportRows);
+  };
+
+  const getColKey = (i: number) =>
+    cols?.[i]?.MetaData?.find((m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER)?.Value?.trim();
+
   for (const row of rows) {
-    const colData = row?.Header?.ColData ?? [];
-    const headerName = colData?.[0]?.value ?? null;
-    const childRows = (row?.Rows?.Row as ReportRows | undefined) ?? [];
+    const headerColSummary = (row?.Summary?.ColData ?? []) as typeof headerColData;
+    const headerColData = headerColSummary.length ? headerColSummary : row?.Header?.ColData;
+
+    const headerName = headerColData?.[0]?.value ?? null;
 
     // If this row is a group (has a header), create a parent account and process its children recursively
     if (headerName) {
@@ -93,19 +103,16 @@ async function walkRows(params: WalkRowsParams) {
         type: convertTypeStringToAccountType(row?.group) ?? null,
       });
 
-      for (let i = 1; i < colData.length && i < cols.length; i++) {
-        const col = cols[i];
-        if (!col) continue;
-
-        const colKey = col.MetaData?.find(
-          (m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER,
-        )?.Value?.trim();
+      for (let i = 1; i < headerColData.length && i < cols.length; i++) {
+        const colKey = getColKey(i);
         if (!colKey || colKey.toLowerCase() === TOTAL_COL_IDENTIFIER) continue;
 
         const periodId = periodMap.get(colKey);
         if (!periodId) continue;
 
-        const amount = parseAmount(colData[i]?.value);
+        const amount = parseAmount(headerColData[i]?.value);
+        if (amount === undefined) continue;
+
         await tx.reportAccountValue.upsert({
           where: { accountId_periodId: { accountId: groupAccount.id, periodId } },
           update: { amount },
@@ -114,6 +121,7 @@ async function walkRows(params: WalkRowsParams) {
       }
 
       // Recurse into children
+      const childRows = toRowArray(row?.Rows?.Row);
       if (childRows.length) {
         await walkRows({
           tx,
@@ -127,9 +135,12 @@ async function walkRows(params: WalkRowsParams) {
       continue;
     }
 
-    // If this row is a leaf (has column data), create a leaf account and upsert a value for each period column
-    if (colData && colData.length > 0) {
-      const name = String(colData[0]?.value ?? 'Unnamed');
+    // Leaf/Data row
+    const leafSummary = (row?.Summary?.ColData ?? []) as typeof headerColData;
+    const leafDataCells = leafSummary.length ? leafSummary : row?.Header?.ColData;
+
+    if (leafDataCells && leafDataCells.length > 0) {
+      const name = String((leafDataCells ?? [])[0]?.value ?? 'Unnamed');
       const leafAccount = await createAccount({
         tx,
         name,
@@ -139,19 +150,16 @@ async function walkRows(params: WalkRowsParams) {
       });
 
       // For each period column (skipping the first, which is the row label), upsert the value for this account and period
-      for (let i = 1; i < colData.length && i < cols.length; i++) {
-        const col = cols[i];
-        if (!col) continue;
-
-        const colKey = col.MetaData?.find(
-          (m) => m.Name?.toLowerCase() === COL_KEY_IDENTIFIER,
-        )?.Value?.trim();
+      for (let i = 1; i < leafDataCells.length && i < cols.length; i++) {
+        const colKey = getColKey(i);
         if (!colKey || colKey.toLowerCase() === TOTAL_COL_IDENTIFIER) continue;
 
         const periodId = periodMap.get(colKey);
         if (!periodId) continue;
 
-        const amount = parseAmount(colData[i]?.value);
+        const amount = parseAmount(leafDataCells[i]?.value);
+        if (amount === undefined) continue;
+
         // Upsert the value for this account and period (ensures idempotency and supports updates)
         await tx.reportAccountValue.upsert({
           where: { accountId_periodId: { accountId: leafAccount.id, periodId } },
@@ -231,7 +239,7 @@ export async function loadTableReport(data: TableReportJsonType, companyId: numb
     },
   });
 
-  // 3) Wipe previous data + 4) Rebuild tree/values
+  // 3) Wipe previous data
   await prisma.$transaction(
     async (tx) => {
       // Find all account IDs for this report to prepare for cleanup
@@ -246,17 +254,19 @@ export async function loadTableReport(data: TableReportJsonType, companyId: numb
         await tx.reportAccountValue.deleteMany({ where: { accountId: { in: accountIds } } });
         await tx.reportAccount.deleteMany({ where: { reportId: report.id } });
       }
-
-      // Recursively walk the report rows to create the account hierarchy and insert values for each period
-      const rows = Array.isArray(rowsRoot?.Row) ? rowsRoot.Row : [];
-      await walkRows({ tx, reportId: report.id, periodMap, cols, rows });
     },
-    // hitting timeout on render
-    {
-      timeout: 20_000,
-      maxWait: 10_000,
-    },
+    { timeout: 20_000, maxWait: 10_000 },
   );
+
+  // Recursively walk the report rows to create the account hierarchy and insert values for each period
+  const rows = Array.isArray(rowsRoot?.Row) ? rowsRoot.Row : rowsRoot?.Row ? [rowsRoot.Row] : [];
+  await walkRows({
+    tx: prisma as unknown as TransactionClient,
+    reportId: report.id,
+    periodMap,
+    cols,
+    rows,
+  });
 
   // Return the report ID and number of periods created
   return { reportId: report.id, periodsCreated };
